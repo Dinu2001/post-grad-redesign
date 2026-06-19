@@ -1,0 +1,530 @@
+// Wayamba University — Postgraduate Registration Portal
+// Datasource: Supabase Postgres (pooled URL for app, direct URL for migrations)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum UserRole {
+  STUDENT
+  SUPERVISOR
+  MAIN_ADMIN
+  FACULTY_ADMIN
+  REGISTRAR
+}
+
+enum PaymentMethod {
+  CASH
+  BANK
+}
+
+enum MaritalStatus {
+  SINGLE
+  MARRIED
+}
+
+enum ContactType {
+  RESIDENTIAL
+  MOBILE
+  OFFICE
+  MOBILE_OFFICE
+}
+
+enum DeclarationStatus {
+  PENDING
+  FACULTY_REVIEW
+  FORWARDED_TO_ADMIN
+  UNDER_REVIEW
+  CORRECTION_REQUESTED
+  APPROVED
+  REJECTED
+}
+
+enum ReviewStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum DegreeLevel {
+  MPHIL
+  PHD
+  OTHER
+}
+
+enum StudyMode {
+  FULL_TIME
+  PART_TIME
+}
+
+// Lifecycle of a registration. Registrar is the gatekeeper:
+//  - ACTIVE: in progress / awaiting or passed registrar review (not yet rejected)
+//  - REJECTED: rejected by registrar; data retained for admin contact, but the
+//    student is free to re-register (NIC uniqueness only applies to ACTIVE rows).
+//  - APPROVED: registrar approved; awaits main + faculty admin sign-off.
+enum ApplicationStatus {
+  ACTIVE
+  REJECTED
+  APPROVED
+}
+
+model DegreeDuration {
+  id    Int         @id @default(autoincrement()) @map("duration_id")
+  level DegreeLevel @map("level")
+  mode  StudyMode   @map("mode")
+  years Int         @map("years")
+
+  @@unique([level, mode])
+  @@map("degree_duration")
+}
+
+model PortalUser {
+  id             Int      @id @default(autoincrement()) @map("user_id")
+  supabaseUserId String?  @unique @map("supabase_user_id")
+  fullName       String   @map("full_name")
+  email          String   @unique
+  passwordHash   String?  @map("password_hash")
+  role           UserRole
+  mustChangePassword Boolean @default(false) @map("must_change_password")
+  // Temporary password kept in plain text only until the student first changes
+  // it, so the registrar can relay credentials (no email delivery yet). Cleared
+  // on the first successful password change.
+  initialPassword String? @map("initial_password")
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  applications ApplicationPostGraduate[]
+  supervisor   SupervisorProfile?
+  admin        AdminProfile?
+  facultyAdmin FacultyAdminProfile?
+  registrar    RegistrarProfile?
+
+  @@map("user")
+}
+
+model RegistrarProfile {
+  id           Int                    @id @default(autoincrement()) @map("registrar_id")
+  userId       Int                    @unique @map("user_id")
+  user         PortalUser             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  declarations ApplicantDeclaration[]
+
+  @@map("registrar")
+}
+
+model FacultyAdminProfile {
+  id         Int        @id @default(autoincrement()) @map("faculty_admin_id")
+  userId     Int        @unique @map("user_id")
+  user       PortalUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+  faculty    String     @map("faculty")
+  facultyId  Int?       @map("faculty_id")
+  facultyRef Faculty?   @relation(fields: [facultyId], references: [id], onDelete: SetNull)
+
+  declarations ApplicantDeclaration[]
+
+  @@map("faculty_admin")
+}
+
+model AdminProfile {
+  id            Int                    @id @default(autoincrement()) @map("admin_id")
+  userId        Int                    @unique @map("user_id")
+  user          PortalUser             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  declarations  ApplicantDeclaration[]
+  presentations Presentation[]
+  notifications Notification[]
+
+  @@map("admin")
+}
+
+model SupervisorProfile {
+  id         Int         @id @default(autoincrement()) @map("supervisor_id")
+  // Nullable: supervisors are first entered by the student during registration
+  // (no portal account yet). An account is linked later once provisioned.
+  userId     Int?        @unique @map("user_id")
+  user       PortalUser? @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name       String      @map("name")
+  title      String?    @map("title")
+  address    String?    @map("address")
+  university String?    @map("university")
+  telephone  String?    @map("telephone")
+  cvFile     String?    @map("cv_file")
+
+  proposals         ProposalSupervisor[]
+  reviews           SupervisorProgressReview[]
+  notifications     Notification[]
+  progressSchedules ProgressReportSchedule[]
+
+  @@map("supervisor")
+}
+
+model PaymentStructure {
+  id            Int            @id @default(autoincrement()) @map("payment_id")
+  description   String?        @map("description")
+  paymentMethod PaymentMethod  @map("payment_method")
+  degreeSoughts DegreeSought[]
+
+  @@map("payment_structure")
+}
+
+model Faculty {
+  id            Int                       @id @default(autoincrement()) @map("faculty_id")
+  name          String                    @unique @map("name")
+  departments   Department[]
+  applications  ApplicationPostGraduate[]
+  facultyAdmins FacultyAdminProfile[]
+
+  @@map("faculty")
+}
+
+model Department {
+  id        Int            @id @default(autoincrement()) @map("department_id")
+  name      String         @map("name")
+  facultyId Int            @map("faculty_id")
+  faculty   Faculty        @relation(fields: [facultyId], references: [id], onDelete: Restrict)
+  degrees   DegreeSought[]
+
+  @@unique([facultyId, name])
+  @@map("department")
+}
+
+model DegreeSought {
+  id            Int               @id @default(autoincrement()) @map("degree_sought_id")
+  name          String            @map("name")
+  type          String?           @map("type")
+  level         DegreeLevel       @default(OTHER) @map("level")
+  // Study modes this degree is offered in (Full time / Part time), set by the
+  // Main Admin when creating the degree. Registration only offers these modes.
+  studyModes    StudyMode[]       @map("study_modes")
+  addDate       DateTime?         @db.Date @map("add_date")
+  faculty       String?           @map("faculty")
+  department    String?           @map("department")
+  departmentId  Int?              @map("department_id")
+  departmentRef Department?       @relation(fields: [departmentId], references: [id], onDelete: SetNull)
+  paymentId     Int?              @map("payment_id")
+  payment       PaymentStructure? @relation(fields: [paymentId], references: [id], onDelete: SetNull)
+
+  researchProposals ResearchProposal[]
+
+  @@map("degree_sought")
+}
+
+model ApplicationPostGraduate {
+  id                 Int               @id @default(autoincrement()) @map("application_id")
+  userId             Int?              @map("student_user_id")
+  user               PortalUser?       @relation(fields: [userId], references: [id], onDelete: SetNull)
+  status             ApplicationStatus @default(ACTIVE) @map("status")
+  fullName           String            @map("full_name")
+  nameWithInitials   String            @map("name_with_initials")
+  // NIC is NOT globally unique: a rejected applicant may re-register. A partial
+  // unique index (status = 'ACTIVE') is added in migration to enforce one active
+  // application per NIC. See prisma/migrations.
+  nic                String
+  dateOfBirth        DateTime          @db.Date @map("date_of_birth")
+  maritalStatus      MaritalStatus?    @map("marital_status")
+  englishProficiency String?           @map("english_proficiency")
+  residentialAddress String?           @map("residential_address")
+  officialAddress    String?           @map("official_address")
+  faculty            String?           @map("faculty")
+  department         String?           @map("department")
+  degreeProgram      String?           @map("degree_program")
+  facultyId          Int?              @map("faculty_id")
+  facultyRef         Faculty?          @relation(fields: [facultyId], references: [id], onDelete: SetNull)
+  studyMode          StudyMode?        @map("study_mode")
+  durationYears      Int?              @map("duration_years")
+  programStartYear   Int?              @map("program_start_year")
+  registrationDate   DateTime          @default(now()) @map("registration_date")
+
+  emails                     ApplicantEmail[]
+  contacts                   ApplicantContact[]
+  workExperiences            WorkExperience[]
+  academicQualifications     AcademicQualification[]
+  professionalQualifications ProfessionalQualification[]
+  declarations               ApplicantDeclaration[]
+  researchProposals          ResearchProposal[]
+  notifications              Notification[]
+
+  @@index([nic])
+  @@map("application_post_graduate")
+}
+
+model ApplicantEmail {
+  id            Int                     @id @default(autoincrement()) @map("email_id")
+  applicationId Int                     @map("application_id")
+  application   ApplicationPostGraduate @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  email         String                  @map("email")
+
+  @@map("applicant_email")
+}
+
+model ApplicantContact {
+  id            Int                     @id @default(autoincrement()) @map("contact_id")
+  applicationId Int                     @map("application_id")
+  application   ApplicationPostGraduate @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  contactType   ContactType             @map("contact_type")
+  contactValue  String                  @map("contact_value")
+
+  @@map("applicant_contact")
+}
+
+model WorkExperience {
+  id                      Int                     @id @default(autoincrement()) @map("work_id")
+  applicationId           Int                     @map("application_id")
+  application             ApplicationPostGraduate @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  organization            String                  @map("organization")
+  periodFrom              DateTime                @db.Date @map("period_from")
+  periodTo                DateTime?               @db.Date @map("period_to")
+  natureOfWork            String?                 @map("nature_of_work")
+  positionHeld            String?                 @map("position_held")
+  currentResponsibilities String?                 @map("current_responsibilities")
+  files                   WorkExperienceFile[]
+
+  @@map("work_experience")
+}
+
+model WorkExperienceFile {
+  id         Int            @id @default(autoincrement()) @map("file_id")
+  workId     Int            @map("work_id")
+  work       WorkExperience @relation(fields: [workId], references: [id], onDelete: Cascade)
+  fileName   String         @map("file_name")
+  filePath   String         @map("file_path")
+  uploadedAt DateTime       @default(now()) @map("uploaded_at")
+
+  @@map("work_experience_file")
+}
+
+model AcademicQualification {
+  id             Int                         @id @default(autoincrement()) @map("academic_id")
+  applicationId  Int                         @map("application_id")
+  application    ApplicationPostGraduate     @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  university     String                      @map("university")
+  degreeName     String?                     @map("degree_name")
+  periodFrom     DateTime?                   @db.Date @map("period_from")
+  periodTo       DateTime?                   @db.Date @map("period_to")
+  specialization String?                     @map("specialization")
+  degreeClass    String?                     @map("degree_class")
+  gpa            String?                     @map("gpa")
+  creditCount    String?                     @map("credit_count")
+  effectiveDate  DateTime?                   @db.Date @map("effective_date")
+  files          AcademicQualificationFile[]
+
+  @@map("academic_qualification")
+}
+
+model AcademicQualificationFile {
+  id         Int                   @id @default(autoincrement()) @map("file_id")
+  academicId Int                   @map("academic_id")
+  academic   AcademicQualification @relation(fields: [academicId], references: [id], onDelete: Cascade)
+  fileName   String                @map("file_name")
+  filePath   String                @map("file_path")
+  uploadedAt DateTime              @default(now()) @map("uploaded_at")
+
+  @@map("academic_qualification_file")
+}
+
+model ProfessionalQualification {
+  id            Int                             @id @default(autoincrement()) @map("professional_id")
+  applicationId Int                             @map("application_id")
+  application   ApplicationPostGraduate         @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  institution   String                          @map("institution")
+  periodFrom    DateTime?                       @db.Date @map("period_from")
+  periodTo      DateTime?                       @db.Date @map("period_to")
+  fieldOfStudy  String?                         @map("field_of_study")
+  files         ProfessionalQualificationFile[]
+
+  @@map("professional_qualification")
+}
+
+model ProfessionalQualificationFile {
+  id             Int                       @id @default(autoincrement()) @map("file_id")
+  professionalId Int                       @map("professional_id")
+  professional   ProfessionalQualification @relation(fields: [professionalId], references: [id], onDelete: Cascade)
+  fileName       String                    @map("file_name")
+  filePath       String                    @map("file_path")
+  uploadedAt     DateTime                  @default(now()) @map("uploaded_at")
+
+  @@map("professional_qualification_file")
+}
+
+// Generic supporting documents tied to the checklist (CV, birth certificate,
+// transcripts, referee reports, budget, supervisor consent letters, etc.).
+model UploadedFile {
+  id            Int      @id @default(autoincrement()) @map("uploaded_file_id")
+  applicationId Int      @map("application_id")
+  fileName      String   @map("file_name")
+  filePath      String   @map("file_path")
+  category      String?  @map("category")
+  uploadedAt    DateTime @default(now()) @map("uploaded_at")
+
+  @@map("uploaded_file")
+}
+
+model ApplicantDeclaration {
+  id               Int                     @id @default(autoincrement()) @map("declaration_id")
+  applicationId    Int                     @map("application_id")
+  application      ApplicationPostGraduate @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  declarationDate  DateTime                @db.Date @map("declaration_date")
+  status           DeclarationStatus       @default(PENDING)
+  adminComment     String?                 @map("admin_comment")
+  adminId          Int?                    @map("admin_id")
+  admin            AdminProfile?           @relation(fields: [adminId], references: [id], onDelete: SetNull)
+  facultyComment   String?                 @map("faculty_comment")
+  facultyAdminId   Int?                    @map("faculty_admin_id")
+  facultyAdmin     FacultyAdminProfile?    @relation(fields: [facultyAdminId], references: [id], onDelete: SetNull)
+  registrarComment String?                 @map("registrar_comment")
+  registrarId      Int?                    @map("registrar_id")
+  registrar        RegistrarProfile?       @relation(fields: [registrarId], references: [id], onDelete: SetNull)
+
+  @@map("applicant_declaration")
+}
+
+model ResearchProposal {
+  id               Int                     @id @default(autoincrement()) @map("proposal_id")
+  applicationId    Int                     @map("application_id")
+  application      ApplicationPostGraduate @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  degreeSoughtId   Int                     @map("degree_sought_id")
+  degreeSought     DegreeSought            @relation(fields: [degreeSoughtId], references: [id], onDelete: Restrict)
+  title            String                  @map("title")
+  description      String?                 @map("description")
+  enrolmentStatus  String?                 @map("enrolment_status")
+  registrarComment String?                 @map("registrar_comment")
+  researchLocation String?                 @map("research_location")
+  submittedDate    DateTime                @default(now()) @map("submitted_date")
+
+  files             ProposalFile[]
+  supervisors       ProposalSupervisor[]
+  progressReports   ProgressReport[]
+  presentations     Presentation[]
+  progressSchedules ProgressReportSchedule[]
+
+  @@map("research_proposal")
+}
+
+model ProgressReportSchedule {
+  id           Int               @id @default(autoincrement()) @map("schedule_id")
+  proposalId   Int               @map("proposal_id")
+  proposal     ResearchProposal  @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+  supervisorId Int               @map("supervisor_id")
+  supervisor   SupervisorProfile @relation(fields: [supervisorId], references: [id], onDelete: Restrict)
+  title        String            @map("title")
+  dueDate      DateTime          @map("due_date")
+  createdAt    DateTime          @default(now()) @map("created_at")
+  reports      ProgressReport[]
+
+  @@map("progress_report_schedule")
+}
+
+model ProposalFile {
+  id         Int              @id @default(autoincrement()) @map("file_id")
+  proposalId Int              @map("proposal_id")
+  proposal   ResearchProposal @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+  fileName   String           @map("file_name")
+  filePath   String           @map("file_path")
+  uploadedAt DateTime         @default(now()) @map("uploaded_at")
+
+  @@map("proposal_file")
+}
+
+model ProposalSupervisor {
+  id           Int               @id @default(autoincrement())
+  proposalId   Int               @map("proposal_id")
+  proposal     ResearchProposal  @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+  supervisorId Int               @map("supervisor_id")
+  supervisor   SupervisorProfile @relation(fields: [supervisorId], references: [id], onDelete: Restrict)
+  isMain       Boolean           @default(false) @map("is_main")
+  // Supervisor's CV uploaded by the student for this selection (Supabase path).
+  // Stored per-link, not on the shared master SupervisorProfile.
+  cvDocument      String?        @map("cv_document")
+  // Document showing the supervisor is willing to supervise this proposal,
+  // uploaded by the student during registration (Supabase storage path).
+  consentDocument String?        @map("consent_document")
+  assignedDate DateTime          @default(now()) @map("assigned_date")
+  status       ReviewStatus      @default(PENDING)
+  comment      String?           @map("comment")
+  reviewedAt   DateTime?         @map("reviewed_at")
+
+  @@unique([proposalId, supervisorId])
+  @@map("proposal_supervisor")
+}
+
+model ProgressReport {
+  id          Int                     @id @default(autoincrement()) @map("progress_id")
+  proposalId  Int                     @map("proposal_id")
+  proposal    ResearchProposal        @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+  scheduleId  Int?                    @map("schedule_id")
+  schedule    ProgressReportSchedule? @relation(fields: [scheduleId], references: [id], onDelete: SetNull)
+  // Computed submission window this report belongs to, e.g. "2026-H1" (first
+  // half of 2026) / "2026-H2". Ties an upload to a slot in the auto-generated
+  // progress-report schedule (2 per programme year).
+  periodKey   String?                 @map("period_key")
+  title       String                  @map("title")
+  description String?                 @map("description")
+  submittedAt DateTime                @default(now()) @map("submitted_at")
+
+  files         ProgressReportFile[]
+  reviews       SupervisorProgressReview[]
+  presentations Presentation[]
+
+  @@map("progress_report")
+}
+
+model ProgressReportFile {
+  id               Int            @id @default(autoincrement()) @map("file_id")
+  progressId       Int            @map("progress_id")
+  progress         ProgressReport @relation(fields: [progressId], references: [id], onDelete: Cascade)
+  originalFileName String         @map("original_file_name")
+  filePath         String         @map("file_path")
+  uploadedAt       DateTime       @default(now()) @map("uploaded_at")
+
+  @@map("progress_report_file")
+}
+
+model SupervisorProgressReview {
+  id             Int               @id @default(autoincrement()) @map("review_id")
+  progressId     Int               @map("progress_id")
+  progress       ProgressReport    @relation(fields: [progressId], references: [id], onDelete: Cascade)
+  supervisorId   Int               @map("supervisor_id")
+  supervisor     SupervisorProfile @relation(fields: [supervisorId], references: [id], onDelete: Restrict)
+  status         ReviewStatus      @default(PENDING)
+  comment        String?           @map("comment")
+  signedDocument String?           @map("signed_document")
+  reviewedAt     DateTime?         @map("reviewed_at")
+
+  @@map("supervisor_progress_review")
+}
+
+model Presentation {
+  id               Int              @id @default(autoincrement()) @map("presentation_id")
+  proposalId       Int              @map("proposal_id")
+  proposal         ResearchProposal @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+  progressId       Int?             @map("progress_id")
+  progress         ProgressReport?  @relation(fields: [progressId], references: [id], onDelete: SetNull)
+  title            String           @map("title")
+  presentationDate DateTime         @map("presentation_date")
+  isDone           Boolean          @default(false) @map("is_done")
+  isFinal          Boolean          @default(false) @map("is_final")
+  createdByAdminId Int              @map("created_by_admin")
+  createdByAdmin   AdminProfile     @relation(fields: [createdByAdminId], references: [id], onDelete: Restrict)
+  createdAt        DateTime         @default(now()) @map("created_at")
+
+  @@map("presentation")
+}
+
+model Notification {
+  id            Int                      @id @default(autoincrement()) @map("notification_id")
+  title         String                   @map("title")
+  message       String                   @map("message")
+  isRead        Boolean                  @default(false) @map("is_read")
+  createdAt     DateTime                 @default(now()) @map("created_at")
+  applicationId Int?                     @map("application_id")
+  application   ApplicationPostGraduate? @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  supervisorId  Int?                     @map("supervisor_id")
+  supervisor    SupervisorProfile?       @relation(fields: [supervisorId], references: [id], onDelete: Cascade)
+  adminId       Int?                     @map("admin_id")
+  admin         AdminProfile?            @relation(fields: [adminId], references: [id], onDelete: Cascade)
+
+  @@map("notification")
+}
