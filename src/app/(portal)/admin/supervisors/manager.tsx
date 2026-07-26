@@ -16,6 +16,9 @@ export type SupervisorRow = {
   university: string | null;
   telephone: string | null;
   hasAccount: boolean;
+  email?: string;
+  initialPassword?: string | null;
+  mustChangePassword?: boolean;
   usageCount: number;
 };
 
@@ -26,7 +29,11 @@ function useAction() {
   const router = useRouter();
   const [pending, start] = useTransition();
   const [error, setError] = useState<string | null>(null);
-  function run(action: (fd: FormData) => Promise<ActionResult>, fd: FormData, done?: () => void) {
+  function run(
+    action: (fd: FormData) => Promise<ActionResult>,
+    fd: FormData,
+    done?: (res: ActionResult) => void,
+  ) {
     setError(null);
     start(async () => {
       const res = await action(fd);
@@ -34,7 +41,7 @@ function useAction() {
         setError(res.error);
         return;
       }
-      done?.();
+      done?.(res);
       router.refresh();
     });
   }
@@ -76,19 +83,27 @@ export function SupervisorManager({ supervisors }: { supervisors: SupervisorRow[
 
 function AddSupervisor() {
   const { pending, error, run } = useAction();
+  const [created, setCreated] = useState<{ email: string; tempPassword: string } | null>(null);
   return (
     <form
-      action={(fd) => run(createSupervisor, fd)}
+      action={(fd) => run(createSupervisor, fd, (res) => {
+        if (res.ok && res.tempPassword && res.email) {
+          setCreated({ email: res.email, tempPassword: res.tempPassword });
+        } else {
+          setCreated(null);
+        }
+      })}
       className="rounded-lg border border-border bg-white p-4"
     >
       <h3 className="mb-3 text-base font-bold text-black">Add supervisor</h3>
-      <div className="grid gap-3 sm:grid-cols-4">
+      <div className="grid gap-3 sm:grid-cols-5">
         <input name="name" placeholder="Full name *" className={input} required />
+        <input name="email" type="email" placeholder="Email *" className={input} required />
         <input name="title" placeholder="Title (e.g. Prof.)" className={input} />
         <input name="university" placeholder="University" className={input} />
         <input name="telephone" placeholder="Telephone" className={input} />
       </div>
-      <div className="mt-3 flex items-center gap-3">
+      <div className="mt-3 flex flex-wrap items-center gap-3">
         <button
           type="submit"
           disabled={pending}
@@ -98,6 +113,13 @@ function AddSupervisor() {
         </button>
         {error && <p className="text-sm text-black">{error}</p>}
       </div>
+      {created && (
+        <div className="mt-3 rounded-md border border-black bg-neutral-50 p-3 text-sm text-black">
+          <p className="font-semibold">Temporary login created</p>
+          <p>Email: {created.email}</p>
+          <p>Password: {created.tempPassword}</p>
+        </div>
+      )}
     </form>
   );
 }
@@ -137,12 +159,23 @@ function SupervisorRowItem({ s }: { s: SupervisorRow }) {
   return (
     <tr className="border-b border-border last:border-0">
       <td className="px-4 py-2 font-medium text-black">
-        {s.name}
-        {s.hasAccount && (
-          <span className="ml-2 rounded bg-black px-1.5 py-0.5 text-[10px] font-semibold text-white">
-            ACCOUNT
-          </span>
-        )}
+        <div>
+          <p>{s.name}</p>
+          {s.hasAccount && (
+            <div className="mt-1 space-y-1">
+              <span className="rounded bg-black px-1.5 py-0.5 text-[10px] font-semibold text-white">
+                ACCOUNT
+              </span>
+              {s.initialPassword && s.mustChangePassword && (
+                <div className="mt-2 text-xs text-neutral-600">
+                  <p className="font-medium">Temp. login:</p>
+                  <p>Email: {s.email}</p>
+                  <p>Password: <code className="bg-neutral-100 px-1 py-0.5 font-mono">{s.initialPassword}</code></p>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
       </td>
       <td className="px-4 py-2 text-neutral-600">{s.title ?? "—"}</td>
       <td className="px-4 py-2 text-neutral-600">{s.university ?? "—"}</td>

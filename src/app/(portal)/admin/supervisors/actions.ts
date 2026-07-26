@@ -4,11 +4,23 @@ import { revalidatePath } from "next/cache";
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { requireRole } from "@/lib/guard";
+import { hashPassword } from "@/lib/auth";
 
-export type ActionResult = { ok: true } | { ok: false; error: string };
+export type ActionResult =
+  | { ok: true; tempPassword?: string; email?: string }
+  | { ok: false; error: string };
 
 function str(form: FormData, key: string): string {
   return String(form.get(key) ?? "").trim();
+}
+
+function generateTempPassword(): string {
+  const bytes = new Uint8Array(4);
+  crypto.getRandomValues(bytes);
+  const hex = Array.from(bytes)
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+  return `WU-${hex}!`;
 }
 
 export async function createSupervisor(form: FormData): Promise<ActionResult> {
@@ -16,14 +28,46 @@ export async function createSupervisor(form: FormData): Promise<ActionResult> {
   const name = str(form, "name");
   if (!name) return { ok: false, error: "Supervisor name is required." };
 
-  await prisma.supervisorProfile.create({
-    data: {
-      name,
-      title: str(form, "title") || null,
-      university: str(form, "university") || null,
-      telephone: str(form, "telephone") || null,
-    },
-  });
+  const email = str(form, "email").toLowerCase();
+  if (!email) return { ok: false, error: "Supervisor email is required." };
+
+  const tempPassword = generateTempPassword();
+  const passwordHash = await hashPassword(tempPassword);
+
+  try {
+    await prisma.$transaction(async (tx) => {
+      const profile = await tx.supervisorProfile.create({
+        data: {
+          name,
+          title: str(form, "title") || null,
+          university: str(form, "university") || null,
+          telephone: str(form, "telephone") || null,
+        },
+      });
+
+      const user = await tx.portalUser.create({
+        data: {
+          fullName: name,
+          email,
+          passwordHash,
+          role: "SUPERVISOR",
+          mustChangePassword: true,
+          initialPassword: tempPassword,
+        },
+      });
+
+      await tx.supervisorProfile.update({
+        where: { id: profile.id },
+        data: { userId: user.id },
+      });
+    });
+  } catch (e) {
+    if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === "P2002") {
+      return { ok: false, error: "A user with that email already exists." };
+    }
+    return { ok: false, error: "Could not create supervisor account." };
+  }
+
   revalidatePath("/admin/supervisors");
   return { ok: true };
 }

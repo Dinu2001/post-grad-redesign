@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { ApplicationStatus } from "@prisma/client";
 
 export type AppRow = {
@@ -19,9 +20,11 @@ const STATUS_STYLES: Record<ApplicationStatus, string> = {
 export function ApplicationsTable({
   rows,
   emptyMessage = "No applications.",
+  showDetailLink = false,
 }: {
   rows: AppRow[];
   emptyMessage?: string;
+  showDetailLink?: boolean;
 }) {
   if (rows.length === 0) {
     return (
@@ -42,6 +45,7 @@ export function ApplicationsTable({
             <th className="px-4 py-2 font-semibold">Degree</th>
             <th className="px-4 py-2 font-semibold">Submitted</th>
             <th className="px-4 py-2 font-semibold">Status</th>
+            {showDetailLink && <th className="px-4 py-2 font-semibold"></th>}
           </tr>
         </thead>
         <tbody>
@@ -63,6 +67,16 @@ export function ApplicationsTable({
                   {r.status}
                 </span>
               </td>
+              {showDetailLink && (
+                <td className="px-4 py-2 text-right">
+                  <Link
+                    href={`/admin/applications/${r.id}`}
+                    className="text-xs font-medium text-black underline hover:text-neutral-600"
+                  >
+                    View
+                  </Link>
+                </td>
+              )}
             </tr>
           ))}
         </tbody>

@@ -102,20 +102,38 @@ export default async function StudentProgressPage() {
                 </div>
 
                 {status === "submitted" && report ? (
-                  <div className="mt-2 text-sm text-neutral-600">
-                    Submitted {fmt(report.submittedAt)}
-                    {file && (
-                      <>
-                        {" · "}
-                        <a
-                          href={`/api/files?path=${encodeURIComponent(file.filePath)}`}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="text-black underline"
-                        >
-                          {file.originalFileName}
-                        </a>
-                      </>
+                  <div className="mt-2 space-y-2 text-sm">
+                    <div className="text-neutral-600">
+                      Submitted {fmt(report.submittedAt)}
+                      {file && (
+                        <>
+                          {" · "}
+                          <a
+                            href={`/api/files?path=${encodeURIComponent(file.filePath)}`}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="text-black underline"
+                          >
+                            {file.originalFileName}
+                          </a>
+                        </>
+                      )}
+                    </div>
+                    {report.reviews.length > 0 && (
+                      <div className="rounded border border-border bg-neutral-50 p-2">
+                        <p className="font-semibold text-black">Supervisor feedback:</p>
+                        {report.reviews.map((review) => (
+                          <div key={review.id} className="mt-1 text-xs text-neutral-600">
+                            <p className="font-medium text-black">
+                              {review.supervisor.name} ({review.status})
+                            </p>
+                            {review.comment && <p>{review.comment}</p>}
+                            {review.reviewedAt && (
+                              <p className="mt-0.5 text-neutral-500">{fmt(review.reviewedAt)}</p>
+                            )}
+                          </div>
+                        ))}
+                      </div>
                     )}
                   </div>
                 ) : canSubmit(status) ? (

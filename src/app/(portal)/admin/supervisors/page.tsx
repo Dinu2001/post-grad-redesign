@@ -17,6 +17,7 @@ export default async function SupervisorsPage() {
       university: true,
       telephone: true,
       userId: true,
+      user: { select: { email: true, initialPassword: true, mustChangePassword: true } },
       _count: { select: { proposals: true } },
     },
   });
@@ -28,6 +29,9 @@ export default async function SupervisorsPage() {
     university: s.university,
     telephone: s.telephone,
     hasAccount: s.userId != null,
+    email: s.user?.email,
+    initialPassword: s.user?.initialPassword,
+    mustChangePassword: s.user?.mustChangePassword,
     usageCount: s._count.proposals,
   }));
 

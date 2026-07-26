@@ -15,7 +15,13 @@ export async function getStudentApplication(userId: number) {
             orderBy: { isMain: "desc" },
           },
           progressReports: {
-            include: { files: true },
+            include: {
+              files: true,
+              reviews: {
+                include: { supervisor: true },
+                orderBy: { reviewedAt: "desc" },
+              },
+            },
             orderBy: { submittedAt: "desc" },
           },
         },
