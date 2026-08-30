@@ -100,7 +100,7 @@ export default async function StudentDashboard() {
         </Card>
       </div>
 
-      <div className="mt-4">
+      <div className="mt-4 space-y-4">
         <Card title="Progress reports">
           <div className="mb-3 flex flex-wrap gap-6 text-sm">
             <div>
@@ -132,6 +132,15 @@ export default async function StudentDashboard() {
               </Link>
             </p>
           )}
+        </Card>
+
+        <Card title="Presentations">
+          <p className="text-sm text-neutral-600">
+            Your presentation will be scheduled by the Registrar after your application is approved.{" "}
+            <Link href="/student/presentations" className="underline">
+              View presentation schedule →
+            </Link>
+          </p>
         </Card>
       </div>
     </>

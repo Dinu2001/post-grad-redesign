@@ -25,10 +25,14 @@ export function progressSchedule(
   const years = durationYears(level, mode);
   if (!years) return [];
 
+  // Reports begin in the year after registration. A student who registers in
+  // 2026 will have their first submission window in Jan–Jun 2027.
+  const firstReportYear = startYear + 1;
+
   const windows: ReportWindow[] = [];
   let index = 1;
   for (let y = 0; y < years; y++) {
-    const cal = startYear + y;
+    const cal = firstReportYear + y;
     windows.push({
       index: index++,
       programmeYear: y + 1,

@@ -5,6 +5,11 @@ import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { requireRole } from "@/lib/guard";
 import { hashPassword } from "@/lib/auth";
+import {
+  sendStudentApprovalNotification,
+  sendPasswordResetNotification,
+  sendRegistrationRejectedNotification,
+} from "@/lib/email";
 
 export type ApproveResult =
   | { ok: true; email: string; tempPassword: string }
@@ -105,6 +110,9 @@ export async function approveRegistration(
         });
       }
     });
+
+    // Send email notification to student with login credentials
+    await sendStudentApprovalNotification(email, app.fullName, tempPassword);
   } catch (e) {
     if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === "P2002") {
       return { ok: false, error: "A user with that email already exists." };
@@ -139,7 +147,7 @@ export async function resetStudentPassword(
 
   const app = await prisma.applicationPostGraduate.findUnique({
     where: { id: applicationId },
-    select: { status: true, userId: true },
+    select: { status: true, userId: true, fullName: true, emails: true },
   });
   if (!app || app.status !== "APPROVED" || !app.userId) {
     return { ok: false, error: "No approved student account for this application." };
@@ -154,6 +162,12 @@ export async function resetStudentPassword(
       mustChangePassword: true,
     },
   });
+
+  // Send email notification to student
+  const studentEmail = app.emails[0]?.email;
+  if (studentEmail) {
+    await sendPasswordResetNotification(studentEmail, app.fullName, temp);
+  }
 
   revalidatePath("/registrar/approved");
   revalidatePath(`/registrar/registrations/${applicationId}`);
@@ -173,12 +187,14 @@ export async function rejectRegistration(
 
   const app = await prisma.applicationPostGraduate.findUnique({
     where: { id: applicationId },
-    include: { declarations: true },
+    include: { declarations: true, emails: true },
   });
   if (!app) return { ok: false, error: "Application not found." };
   if (app.status !== "ACTIVE") {
     return { ok: false, error: "This application has already been decided." };
   }
+
+  const rejectionReason = comment.trim() || "Rejected by registrar.";
 
   try {
     await prisma.$transaction(async (tx) => {
@@ -193,11 +209,16 @@ export async function rejectRegistration(
           data: {
             status: "REJECTED",
             registrarId: registrar.id,
-            registrarComment: comment.trim() || "Rejected by registrar.",
+            registrarComment: rejectionReason,
           },
         });
       }
     });
+
+    const email = app.emails[0]?.email;
+    if (email) {
+      await sendRegistrationRejectedNotification(email, app.fullName, rejectionReason);
+    }
   } catch {
     return { ok: false, error: "Could not reject the application." };
   }

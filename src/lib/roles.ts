@@ -29,16 +29,20 @@ export const ROLE_NAV: Record<UserRole, NavLink[]> = {
     { label: "My Application", href: "/student/application" },
     { label: "Research Proposal", href: "/student/proposal" },
     { label: "Progress Reports", href: "/student/progress" },
+    { label: "Presentations", href: "/student/presentations" },
   ],
   SUPERVISOR: [
     { label: "Dashboard", href: "/supervisor" },
     { label: "My Students", href: "/supervisor/students" },
     { label: "Progress Reviews", href: "/supervisor/reviews" },
+    { label: "Presentations", href: "/supervisor/presentations" },
   ],
   REGISTRAR: [
     { label: "Dashboard", href: "/registrar" },
     { label: "New Registrations", href: "/registrar/registrations" },
     { label: "Approved", href: "/registrar/approved" },
+    { label: "Pending Presentations", href: "/registrar/presentations" },
+    { label: "Completed Presentations", href: "/registrar/presentations/completed" },
     { label: "Rejected", href: "/registrar/rejected" },
   ],
   MAIN_ADMIN: [

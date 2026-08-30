@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { requireRole } from "@/lib/guard";
 import { prisma } from "@/lib/prisma";
 import { PageHeader } from "@/components/page-header";
@@ -44,8 +45,16 @@ export default async function SupervisorDashboard() {
     <>
       <PageHeader
         title={`Welcome, ${session.fullName}`}
-        subtitle="Supervisor — view assigned students and review their progress reports."
+        subtitle="Supervisor — view assigned students, review progress reports, and manage presentations."
       />
+      <div className="mb-4 flex gap-2">
+        <Link
+          href="/supervisor/presentations"
+          className="rounded-md bg-black px-4 py-2 text-sm font-semibold text-white hover:bg-neutral-800"
+        >
+          View Presentations
+        </Link>
+      </div>
       <div className="space-y-3">
         {proposals.length === 0 ? (
           <div className="rounded-lg border border-dashed border-border bg-white p-8 text-sm text-neutral-500">

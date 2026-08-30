@@ -7,6 +7,7 @@ export async function getStudentApplication(userId: number) {
     where: { userId, status: "APPROVED" },
     orderBy: { id: "desc" },
     include: {
+      emails: true,
       researchProposals: {
         include: {
           degreeSought: true,
