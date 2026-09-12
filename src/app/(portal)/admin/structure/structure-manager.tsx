@@ -38,11 +38,11 @@ export type FacultyNode = {
 };
 
 const inputClass =
-  "w-full rounded-md border border-border bg-white px-3 py-2 text-sm text-black outline-none focus:border-black focus:ring-1 focus:ring-black";
+  "w-full rounded-md border border-border bg-white px-3 py-2 text-sm text-black outline-none focus:border-brand focus:ring-1 focus:ring-brand";
 const primaryBtn =
-  "rounded-md bg-black px-3 py-2 text-sm font-semibold text-white transition hover:bg-neutral-800 disabled:opacity-50";
+  "rounded-md bg-brand px-3 py-2 text-sm font-semibold text-white transition hover:bg-brand-dark disabled:opacity-50";
 const ghostBtn =
-  "rounded-md border border-border px-2.5 py-1 text-xs font-medium text-neutral-600 transition hover:border-black hover:text-black disabled:opacity-50";
+  "rounded-md border border-border px-2.5 py-1 text-xs font-medium text-neutral-600 transition hover:border-brand hover:text-brand-dark disabled:opacity-50";
 
 function useAction() {
   const router = useRouter();
@@ -201,13 +201,13 @@ function DepartmentRow({ department }: { department: DepartmentNode }) {
             >
               <span className="text-sm text-black">
                 {deg.name}
-                <span className="ml-2 rounded bg-black px-1.5 py-0.5 text-[10px] font-semibold text-white">
+                <span className="ml-2 rounded bg-brand px-1.5 py-0.5 text-[10px] font-semibold text-white">
                   {deg.level}
                 </span>
                 {deg.studyModes.map((m) => (
                   <span
                     key={m}
-                    className="ml-1 rounded border border-black px-1.5 py-0.5 text-[10px] font-semibold text-black"
+                    className="ml-1 rounded border border-brand px-1.5 py-0.5 text-[10px] font-semibold text-black"
                   >
                     {MODE_LABEL[m]}
                   </span>
@@ -251,13 +251,13 @@ function AddDegree({ departmentId }: { departmentId: number }) {
       <input
         name="name"
         placeholder="Degree name (e.g. PhD in Computer Science)"
-        className="min-w-[14rem] flex-1 rounded-md border border-border bg-white px-3 py-2 text-sm text-black outline-none focus:border-black focus:ring-1 focus:ring-black"
+        className="min-w-[14rem] flex-1 rounded-md border border-border bg-white px-3 py-2 text-sm text-black outline-none focus:border-brand focus:ring-1 focus:ring-brand"
         required
       />
       <select
         name="level"
         defaultValue="PHD"
-        className="rounded-md border border-border bg-white px-2 py-2 text-sm text-black outline-none focus:border-black"
+        className="rounded-md border border-border bg-white px-2 py-2 text-sm text-black outline-none focus:border-brand"
       >
         <option value="PHD">PhD</option>
         <option value="MPHIL">MPhil</option>
@@ -266,7 +266,7 @@ function AddDegree({ departmentId }: { departmentId: number }) {
       <input
         name="type"
         placeholder="Type (optional)"
-        className="w-32 rounded-md border border-border bg-white px-3 py-2 text-sm text-black outline-none focus:border-black focus:ring-1 focus:ring-black"
+        className="w-32 rounded-md border border-border bg-white px-3 py-2 text-sm text-black outline-none focus:border-brand focus:ring-1 focus:ring-brand"
       />
       <label className="flex items-center gap-1 text-xs text-black">
         <input type="checkbox" name="fullTime" defaultChecked /> Full time

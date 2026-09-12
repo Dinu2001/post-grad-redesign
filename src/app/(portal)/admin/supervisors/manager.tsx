@@ -23,7 +23,7 @@ export type SupervisorRow = {
 };
 
 const input =
-  "w-full rounded-md border border-border bg-white px-3 py-2 text-sm text-black outline-none focus:border-black focus:ring-1 focus:ring-black";
+  "w-full rounded-md border border-border bg-white px-3 py-2 text-sm text-black outline-none focus:border-brand focus:ring-1 focus:ring-brand";
 
 function useAction() {
   const router = useRouter();
@@ -107,14 +107,14 @@ function AddSupervisor() {
         <button
           type="submit"
           disabled={pending}
-          className="rounded-md bg-black px-4 py-2 text-sm font-semibold text-white hover:bg-neutral-800 disabled:opacity-50"
+          className="rounded-md bg-brand px-4 py-2 text-sm font-semibold text-white hover:bg-brand-dark disabled:opacity-50"
         >
           Add supervisor
         </button>
         {error && <p className="text-sm text-black">{error}</p>}
       </div>
       {created && (
-        <div className="mt-3 rounded-md border border-black bg-neutral-50 p-3 text-sm text-black">
+        <div className="mt-3 rounded-md border border-brand bg-neutral-50 p-3 text-sm text-black">
           <p className="font-semibold">Temporary login created</p>
           <p>Email: {created.email}</p>
           <p>Password: {created.tempPassword}</p>
@@ -142,7 +142,7 @@ function SupervisorRowItem({ s }: { s: SupervisorRow }) {
             <input name="university" defaultValue={s.university ?? ""} className={input} placeholder="University" />
             <input name="telephone" defaultValue={s.telephone ?? ""} className={input} placeholder="Telephone" />
             <div className="flex gap-2">
-              <button type="submit" disabled={pending} className="rounded-md bg-black px-3 py-2 text-xs font-semibold text-white">
+              <button type="submit" disabled={pending} className="rounded-md bg-brand px-3 py-2 text-xs font-semibold text-white">
                 Save
               </button>
               <button type="button" onClick={() => setEditing(false)} className="rounded-md border border-border px-3 py-2 text-xs font-medium text-black">
@@ -163,7 +163,7 @@ function SupervisorRowItem({ s }: { s: SupervisorRow }) {
           <p>{s.name}</p>
           {s.hasAccount && (
             <div className="mt-1 space-y-1">
-              <span className="rounded bg-black px-1.5 py-0.5 text-[10px] font-semibold text-white">
+              <span className="rounded bg-brand px-1.5 py-0.5 text-[10px] font-semibold text-white">
                 ACCOUNT
               </span>
               {s.initialPassword && s.mustChangePassword && (
@@ -184,7 +184,7 @@ function SupervisorRowItem({ s }: { s: SupervisorRow }) {
         <div className="flex justify-end gap-2">
           <button
             onClick={() => setEditing(true)}
-            className="rounded-md border border-border px-2.5 py-1 text-xs font-medium text-neutral-600 hover:border-black hover:text-black"
+            className="rounded-md border border-border px-2.5 py-1 text-xs font-medium text-neutral-600 hover:border-brand hover:text-brand-dark"
           >
             Edit
           </button>
@@ -194,7 +194,7 @@ function SupervisorRowItem({ s }: { s: SupervisorRow }) {
               type="submit"
               disabled={pending || s.usageCount > 0}
               title={s.usageCount > 0 ? "Used in an application" : "Delete"}
-              className="rounded-md border border-border px-2.5 py-1 text-xs font-medium text-neutral-600 hover:border-black hover:text-black disabled:opacity-40"
+              className="rounded-md border border-border px-2.5 py-1 text-xs font-medium text-neutral-600 hover:border-brand hover:text-brand-dark disabled:opacity-40"
             >
               Delete
             </button>

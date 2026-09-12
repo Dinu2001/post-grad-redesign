@@ -47,7 +47,7 @@ export default async function RegisterPage() {
       <header className="border-b border-border bg-white">
         <div className="mx-auto flex max-w-4xl items-center justify-between px-6 py-4">
           <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-full border-2 border-black">
+            <div className="flex h-9 w-9 items-center justify-center rounded-full border-2 border-brand">
               <span className="text-sm font-bold">WU</span>
             </div>
             <div className="leading-tight">

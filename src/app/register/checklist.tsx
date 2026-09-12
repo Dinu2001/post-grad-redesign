@@ -76,7 +76,7 @@ const ITEMS: { n: number; title: string; mode: "Upload" | "Physical"; note: stri
 
 export function Checklist() {
   return (
-    <section className="mb-8 rounded-lg border border-black bg-white p-6">
+    <section className="mb-8 rounded-lg border border-brand bg-white p-6">
       <h2 className="text-lg font-bold text-black">Application checklist</h2>
       <p className="mt-1 text-sm text-neutral-600">
         Before you begin, make sure you have the following ready. Items marked{" "}
@@ -91,7 +91,7 @@ export function Checklist() {
             key={it.n}
             className="flex gap-3 rounded-md border border-border p-3 text-sm"
           >
-            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-black text-xs font-bold text-white">
+            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-brand text-xs font-bold text-white">
               {it.n}
             </span>
             <div>
@@ -100,8 +100,8 @@ export function Checklist() {
                 <span
                   className={`mr-1 rounded px-1.5 py-0.5 text-[10px] font-semibold ${
                     it.mode === "Upload"
-                      ? "bg-black text-white"
-                      : "border border-black text-black"
+                      ? "bg-brand text-white"
+                      : "border border-brand text-black"
                   }`}
                 >
                   {it.mode}

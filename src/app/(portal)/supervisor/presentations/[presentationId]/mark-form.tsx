@@ -52,7 +52,7 @@ export function MarkPresentationCompleteForm({
       <button
         onClick={handleMarkDone}
         disabled={pending}
-        className="rounded-md bg-black px-4 py-2 text-sm font-semibold text-white hover:bg-neutral-800 disabled:opacity-50"
+        className="rounded-md bg-brand px-4 py-2 text-sm font-semibold text-white hover:bg-brand-dark disabled:opacity-50"
       >
         {pending ? "Marking..." : "Mark Complete"}
       </button>

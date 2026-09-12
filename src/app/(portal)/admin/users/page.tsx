@@ -51,7 +51,7 @@ export default async function UsersPage() {
                   </td>
                   <td className="px-4 py-2 text-neutral-600">{u.email}</td>
                   <td className="px-4 py-2">
-                    <span className="rounded bg-black px-2 py-0.5 text-xs font-semibold text-white">
+                    <span className="rounded bg-brand px-2 py-0.5 text-xs font-semibold text-white">
                       {ROLE_LABELS[u.role]}
                     </span>
                   </td>

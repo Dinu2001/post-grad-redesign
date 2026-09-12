@@ -12,9 +12,9 @@ export type AppRow = {
 };
 
 const STATUS_STYLES: Record<ApplicationStatus, string> = {
-  ACTIVE: "bg-neutral-200 text-black",
-  APPROVED: "bg-black text-white",
-  REJECTED: "border border-black text-black",
+  ACTIVE: "bg-amber-100 text-amber-700 ring-1 ring-amber-200",
+  APPROVED: "bg-emerald-100 text-emerald-700 ring-1 ring-emerald-200",
+  REJECTED: "bg-rose-100 text-rose-700 ring-1 ring-rose-200",
 };
 
 export function ApplicationsTable({
@@ -28,50 +28,55 @@ export function ApplicationsTable({
 }) {
   if (rows.length === 0) {
     return (
-      <div className="rounded-lg border border-dashed border-border bg-white p-8 text-center text-sm text-neutral-500">
+      <div className="card-shadow rounded-2xl border border-dashed border-border bg-white p-8 text-center text-sm text-neutral-500">
         {emptyMessage}
       </div>
     );
   }
 
   return (
-    <div className="overflow-hidden rounded-lg border border-border bg-white">
+    <div className="card-shadow overflow-hidden rounded-2xl border border-border bg-white">
       <table className="w-full text-left text-sm">
-        <thead className="border-b border-border bg-muted text-xs uppercase tracking-wide text-neutral-500">
+        <thead className="border-b border-border bg-brand-light text-xs uppercase tracking-wide text-brand-dark">
           <tr>
-            <th className="px-4 py-2 font-semibold">Applicant</th>
-            <th className="px-4 py-2 font-semibold">NIC</th>
-            <th className="px-4 py-2 font-semibold">Faculty</th>
-            <th className="px-4 py-2 font-semibold">Degree</th>
-            <th className="px-4 py-2 font-semibold">Submitted</th>
-            <th className="px-4 py-2 font-semibold">Status</th>
-            {showDetailLink && <th className="px-4 py-2 font-semibold"></th>}
+            <th className="px-4 py-3 font-semibold">Applicant</th>
+            <th className="px-4 py-3 font-semibold">NIC</th>
+            <th className="px-4 py-3 font-semibold">Faculty</th>
+            <th className="px-4 py-3 font-semibold">Degree</th>
+            <th className="px-4 py-3 font-semibold">Submitted</th>
+            <th className="px-4 py-3 font-semibold">Status</th>
+            {showDetailLink && <th className="px-4 py-3 font-semibold"></th>}
           </tr>
         </thead>
         <tbody>
           {rows.map((r) => (
-            <tr key={r.id} className="border-b border-border last:border-0">
-              <td className="px-4 py-2 font-medium text-black">{r.fullName}</td>
-              <td className="px-4 py-2 text-neutral-600">{r.nic}</td>
-              <td className="px-4 py-2 text-neutral-600">{r.faculty ?? "—"}</td>
-              <td className="px-4 py-2 text-neutral-600">
+            <tr
+              key={r.id}
+              className="border-b border-border transition-colors last:border-0 hover:bg-brand-light/40"
+            >
+              <td className="px-4 py-3 font-medium text-foreground">
+                {r.fullName}
+              </td>
+              <td className="px-4 py-3 text-neutral-600">{r.nic}</td>
+              <td className="px-4 py-3 text-neutral-600">{r.faculty ?? "—"}</td>
+              <td className="px-4 py-3 text-neutral-600">
                 {r.degreeProgram ?? "—"}
               </td>
-              <td className="px-4 py-2 text-neutral-600">
+              <td className="px-4 py-3 text-neutral-600">
                 {r.registrationDate.toLocaleDateString()}
               </td>
-              <td className="px-4 py-2">
+              <td className="px-4 py-3">
                 <span
-                  className={`rounded px-2 py-0.5 text-xs font-semibold ${STATUS_STYLES[r.status]}`}
+                  className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-semibold ${STATUS_STYLES[r.status]}`}
                 >
                   {r.status}
                 </span>
               </td>
               {showDetailLink && (
-                <td className="px-4 py-2 text-right">
+                <td className="px-4 py-3 text-right">
                   <Link
                     href={`/admin/applications/${r.id}`}
-                    className="text-xs font-medium text-black underline hover:text-neutral-600"
+                    className="inline-flex items-center gap-1 rounded-lg bg-brand-light px-3 py-1 text-xs font-semibold text-brand transition hover:bg-brand hover:text-white"
                   >
                     View
                   </Link>

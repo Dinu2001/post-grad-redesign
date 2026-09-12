@@ -93,7 +93,7 @@ const initialForm: Form = {
 };
 
 const input =
-  "w-full rounded-md border border-border bg-white px-3 py-2 text-sm text-black outline-none focus:border-black focus:ring-1 focus:ring-black";
+  "w-full rounded-md border border-border bg-white px-3 py-2 text-sm text-black outline-none focus:border-brand focus:ring-1 focus:ring-brand";
 const label = "mb-1 block text-sm font-medium text-black";
 const card = "rounded-lg border border-border bg-white p-4";
 
@@ -245,9 +245,9 @@ export function RegistrationWizard({
             key={s}
             className={`rounded-full border px-3 py-1 font-medium ${
               i === step
-                ? "border-black bg-black text-white"
+                ? "border-brand bg-brand text-white"
                 : i < step
-                  ? "border-black bg-white text-black"
+                  ? "border-brand bg-white text-black"
                   : "border-border bg-white text-neutral-400"
             }`}
           >
@@ -279,7 +279,7 @@ export function RegistrationWizard({
       </div>
 
       {error && (
-        <p className="mt-4 rounded-md border border-black bg-neutral-50 px-3 py-2 text-sm text-black">
+        <p className="mt-4 rounded-md border border-brand bg-neutral-50 px-3 py-2 text-sm text-black">
           {error}
         </p>
       )}
@@ -289,7 +289,7 @@ export function RegistrationWizard({
           type="button"
           onClick={back}
           disabled={step === 0}
-          className="rounded-md border border-border px-4 py-2 text-sm font-medium text-black hover:border-black disabled:opacity-40"
+          className="rounded-md border border-border px-4 py-2 text-sm font-medium text-black hover:border-brand disabled:opacity-40"
         >
           Back
         </button>
@@ -297,7 +297,7 @@ export function RegistrationWizard({
           <button
             type="button"
             onClick={next}
-            className="rounded-md bg-black px-5 py-2 text-sm font-semibold text-white hover:bg-neutral-800"
+            className="rounded-md bg-brand px-5 py-2 text-sm font-semibold text-white hover:bg-brand-dark"
           >
             Continue
           </button>
@@ -306,7 +306,7 @@ export function RegistrationWizard({
             type="button"
             onClick={submit}
             disabled={submitting}
-            className="rounded-md bg-black px-5 py-2 text-sm font-semibold text-white hover:bg-neutral-800 disabled:opacity-50"
+            className="rounded-md bg-brand px-5 py-2 text-sm font-semibold text-white hover:bg-brand-dark disabled:opacity-50"
           >
             {submitting ? "Submitting…" : "Submit application"}
           </button>
@@ -564,7 +564,7 @@ function StepAcademics({ form, set }: { form: Form; set: (p: Partial<Form>) => v
           </div>
         </div>
       ))}
-      <button type="button" className="rounded-md border border-black px-4 py-2 text-sm font-medium text-black hover:bg-black hover:text-white"
+      <button type="button" className="rounded-md border border-brand px-4 py-2 text-sm font-medium text-black hover:bg-brand hover:text-white"
         onClick={() => set({ academics: [...form.academics, emptyAcademic()] })}>
         + Add qualification
       </button>
@@ -607,7 +607,7 @@ function StepWorks({ form, set }: { form: Form; set: (p: Partial<Form>) => void 
           </div>
         </div>
       ))}
-      <button type="button" className="rounded-md border border-black px-4 py-2 text-sm font-medium text-black hover:bg-black hover:text-white"
+      <button type="button" className="rounded-md border border-brand px-4 py-2 text-sm font-medium text-black hover:bg-brand hover:text-white"
         onClick={() => set({ works: [...form.works, emptyWork()] })}>
         + Add work experience
       </button>
@@ -650,7 +650,7 @@ function StepProfessionals({ form, set }: { form: Form; set: (p: Partial<Form>) 
           </div>
         </div>
       ))}
-      <button type="button" className="rounded-md border border-black px-4 py-2 text-sm font-medium text-black hover:bg-black hover:text-white"
+      <button type="button" className="rounded-md border border-brand px-4 py-2 text-sm font-medium text-black hover:bg-brand hover:text-white"
         onClick={() => set({ professionals: [...form.professionals, emptyProf()] })}>
         + Add professional qualification
       </button>
@@ -668,7 +668,7 @@ function MultiFile({ files, onChange, folder, label: lbl }: {
       <h3 className="mb-2 text-base font-bold text-black">{lbl}</h3>
       <ul className="mb-2 space-y-1">
         {files.map((f, i) => (
-          <li key={i} className="flex items-center justify-between rounded border border-black bg-neutral-50 px-3 py-1.5 text-sm">
+          <li key={i} className="flex items-center justify-between rounded border border-brand bg-neutral-50 px-3 py-1.5 text-sm">
             <span className="truncate text-black">✓ {f.fileName}</span>
             <button type="button" className="text-xs text-neutral-600 underline"
               onClick={() => onChange(files.filter((_, j) => j !== i))}>Remove</button>
@@ -775,7 +775,7 @@ function StepProposal({
           are willing to supervise this research.
         </p>
         {supervisorOptions.length === 0 && (
-          <p className="mb-3 rounded-md border border-black bg-neutral-50 px-3 py-2 text-sm text-black">
+          <p className="mb-3 rounded-md border border-brand bg-neutral-50 px-3 py-2 text-sm text-black">
             No supervisors have been published yet. Please contact the postgraduate
             office before completing this step.
           </p>

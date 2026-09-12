@@ -65,11 +65,11 @@ export default async function Page() {
                     </td>
                     <td className="px-4 py-2">
                       {changed ? (
-                        <span className="rounded border border-black px-2 py-0.5 text-xs font-semibold text-black">
+                        <span className="rounded border border-brand px-2 py-0.5 text-xs font-semibold text-black">
                           Password changed by student
                         </span>
                       ) : a.user?.initialPassword ? (
-                        <span className="rounded bg-black px-2 py-0.5 font-mono text-xs font-semibold text-white">
+                        <span className="rounded bg-brand px-2 py-0.5 font-mono text-xs font-semibold text-white">
                           {a.user.initialPassword}
                         </span>
                       ) : (
@@ -79,7 +79,7 @@ export default async function Page() {
                     <td className="px-4 py-2 text-right">
                       <Link
                         href={`/registrar/registrations/${a.id}`}
-                        className="rounded-md border border-border px-3 py-1.5 text-xs font-semibold text-black hover:border-black"
+                        className="rounded-md border border-border px-3 py-1.5 text-xs font-semibold text-black hover:border-brand"
                       >
                         View
                       </Link>

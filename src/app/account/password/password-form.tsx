@@ -48,7 +48,7 @@ export function PasswordForm({
   }
 
   const inputClass =
-    "w-full rounded-md border border-border bg-white px-3 py-2 text-sm text-black outline-none focus:border-black focus:ring-1 focus:ring-black";
+    "w-full rounded-md border border-border bg-white px-3 py-2 text-sm text-black outline-none focus:border-brand focus:ring-1 focus:ring-brand";
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -94,7 +94,7 @@ export function PasswordForm({
       {error && (
         <p
           role="alert"
-          className="rounded-md border border-black bg-neutral-50 px-3 py-2 text-sm text-black"
+          className="rounded-md border border-brand bg-neutral-50 px-3 py-2 text-sm text-black"
         >
           {error}
         </p>
@@ -103,7 +103,7 @@ export function PasswordForm({
       <button
         type="submit"
         disabled={loading}
-        className="w-full rounded-md bg-black px-4 py-2 text-sm font-semibold text-white transition hover:bg-neutral-800 disabled:opacity-50"
+        className="w-full rounded-md bg-brand px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-dark disabled:opacity-50"
       >
         {loading ? "Saving…" : "Save password"}
       </button>

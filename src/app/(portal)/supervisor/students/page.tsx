@@ -65,12 +65,12 @@ export default async function Page() {
                           ? "bg-red-100 text-red-700"
                           : status === "APPROVED"
                             ? "bg-green-100 text-green-700"
-                            : "bg-black text-white"
+                            : "bg-brand text-white"
                       }`}
                     >
                       {status}
                     </span>
-                    <span className="rounded bg-black px-2 py-0.5 text-xs font-semibold text-white">
+                    <span className="rounded bg-brand px-2 py-0.5 text-xs font-semibold text-white">
                       {selfRole?.isMain ? "Main supervisor" : "Co-supervisor"}
                     </span>
                   </div>

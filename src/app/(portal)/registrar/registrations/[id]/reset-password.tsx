@@ -33,7 +33,7 @@ export function ResetPassword({ applicationId }: { applicationId: number }) {
           setOpen(true);
           setDone(false);
         }}
-        className="mt-3 rounded-md border border-black px-4 py-2 text-sm font-semibold text-black hover:bg-black hover:text-white"
+        className="mt-3 rounded-md border border-brand px-4 py-2 text-sm font-semibold text-black hover:bg-brand hover:text-white"
       >
         Set / reset temporary password
       </button>
@@ -51,18 +51,18 @@ export function ResetPassword({ applicationId }: { applicationId: number }) {
           value={value}
           onChange={(e) => setValue(e.target.value)}
           placeholder="At least 6 characters"
-          className="min-w-[14rem] flex-1 rounded-md border border-border bg-white px-3 py-2 text-sm text-black outline-none focus:border-black focus:ring-1 focus:ring-black"
+          className="min-w-[14rem] flex-1 rounded-md border border-border bg-white px-3 py-2 text-sm text-black outline-none focus:border-brand focus:ring-1 focus:ring-brand"
         />
         <button
           onClick={submit}
           disabled={pending}
-          className="rounded-md bg-black px-4 py-2 text-sm font-semibold text-white hover:bg-neutral-800 disabled:opacity-50"
+          className="rounded-md bg-brand px-4 py-2 text-sm font-semibold text-white hover:bg-brand-dark disabled:opacity-50"
         >
           {pending ? "Saving…" : "Save"}
         </button>
         <button
           onClick={() => setOpen(false)}
-          className="rounded-md border border-border px-4 py-2 text-sm font-medium text-black hover:border-black"
+          className="rounded-md border border-border px-4 py-2 text-sm font-medium text-black hover:border-brand"
         >
           Cancel
         </button>

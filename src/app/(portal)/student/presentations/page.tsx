@@ -112,7 +112,7 @@ export default async function StudentPresentationsPage() {
                         <div key={idx} className="flex items-center gap-2">
                           <span className="text-black">{s.supervisor.name}</span>
                           {s.isMain && (
-                            <span className="text-xs bg-black text-white px-2 py-0.5 rounded">
+                            <span className="text-xs bg-brand text-white px-2 py-0.5 rounded">
                               Main
                             </span>
                           )}

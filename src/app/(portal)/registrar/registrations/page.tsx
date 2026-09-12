@@ -58,7 +58,7 @@ export default async function Page() {
                   <td className="px-4 py-2 text-right">
                     <Link
                       href={`/registrar/registrations/${a.id}`}
-                      className="rounded-md bg-black px-3 py-1.5 text-xs font-semibold text-white hover:bg-neutral-800"
+                      className="rounded-md bg-brand px-3 py-1.5 text-xs font-semibold text-white hover:bg-brand-dark"
                     >
                       Review
                     </Link>

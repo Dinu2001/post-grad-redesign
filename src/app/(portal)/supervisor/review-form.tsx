@@ -63,7 +63,7 @@ export function ReviewForm({
       <textarea
         value={comment}
         onChange={(e) => setComment(e.target.value)}
-        className="w-full rounded-md border border-border bg-white px-3 py-2 text-sm outline-none focus:border-black"
+        className="w-full rounded-md border border-border bg-white px-3 py-2 text-sm outline-none focus:border-brand"
         placeholder="Comment (optional)"
       />
       {error && <p className="text-sm text-black">{error}</p>}
@@ -72,7 +72,7 @@ export function ReviewForm({
           type="button"
           onClick={() => submit("APPROVED")}
           disabled={pending}
-          className="rounded-md bg-black px-3 py-2 text-sm font-semibold text-white"
+          className="rounded-md bg-brand px-3 py-2 text-sm font-semibold text-white"
         >
           {pending ? "Saving…" : "Approve"}
         </button>

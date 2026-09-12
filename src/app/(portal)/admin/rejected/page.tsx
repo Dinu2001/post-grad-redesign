@@ -73,7 +73,7 @@ export default async function AdminRejectedPage() {
                   <td className="px-4 py-2 text-right">
                     <Link
                       href={`/admin/rejected/${a.id}`}
-                      className="rounded-md border border-black px-3 py-1.5 text-xs font-semibold text-black hover:bg-black hover:text-white"
+                      className="rounded-md border border-brand px-3 py-1.5 text-xs font-semibold text-black hover:bg-brand hover:text-white"
                     >
                       Details
                     </Link>

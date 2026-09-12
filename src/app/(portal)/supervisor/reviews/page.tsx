@@ -59,7 +59,7 @@ export default async function Page() {
                   <p className="font-semibold text-black">{report.proposal.application.fullName}</p>
                   <p className="text-sm text-neutral-600">{report.proposal.title}</p>
                 </div>
-                <span className="rounded bg-black px-2 py-0.5 text-xs font-semibold text-white">
+                <span className="rounded bg-brand px-2 py-0.5 text-xs font-semibold text-white">
                   {report.reviews[0]?.status ?? "PENDING"}
                 </span>
               </div>

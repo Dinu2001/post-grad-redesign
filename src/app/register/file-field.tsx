@@ -48,7 +48,7 @@ export function FileField({
         <label className="mb-1 block text-sm font-medium text-black">{label}</label>
       )}
       {value ? (
-        <div className="flex items-center justify-between gap-2 rounded-md border border-black bg-neutral-50 px-3 py-2 text-sm">
+        <div className="flex items-center justify-between gap-2 rounded-md border border-brand bg-neutral-50 px-3 py-2 text-sm">
           <span className="truncate text-black">✓ {value.fileName}</span>
           <button
             type="button"
@@ -59,7 +59,7 @@ export function FileField({
           </button>
         </div>
       ) : (
-        <label className="flex cursor-pointer items-center justify-center rounded-md border border-dashed border-border bg-white px-3 py-2 text-sm text-neutral-600 hover:border-black hover:text-black">
+        <label className="flex cursor-pointer items-center justify-center rounded-md border border-dashed border-border bg-white px-3 py-2 text-sm text-neutral-600 hover:border-brand hover:text-brand-dark">
           {uploading ? "Uploading…" : "Choose file"}
           <input
             type="file"

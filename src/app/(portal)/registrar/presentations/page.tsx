@@ -86,7 +86,7 @@ export default async function PresentationsPage() {
                       <td className="px-4 py-2 text-right">
                         <Link
                           href={`/registrar/presentations/assign/${app.id}`}
-                          className="rounded-md bg-black px-3 py-1.5 text-xs font-semibold text-white hover:bg-neutral-800"
+                          className="rounded-md bg-brand px-3 py-1.5 text-xs font-semibold text-white hover:bg-brand-dark"
                         >
                           Assign Date
                         </Link>
@@ -127,7 +127,7 @@ export default async function PresentationsPage() {
                       </span>
                       <Link
                         href={`/registrar/presentations/${presentation.id}`}
-                        className="rounded-md bg-black px-3 py-1.5 text-xs font-semibold text-white hover:bg-neutral-800"
+                        className="rounded-md bg-brand px-3 py-1.5 text-xs font-semibold text-white hover:bg-brand-dark"
                       >
                         View
                       </Link>
@@ -167,7 +167,7 @@ export default async function PresentationsPage() {
                       </span>
                       <Link
                         href={`/registrar/presentations/${presentation.id}`}
-                        className="rounded-md bg-black px-3 py-1.5 text-xs font-semibold text-white hover:bg-neutral-800"
+                        className="rounded-md bg-brand px-3 py-1.5 text-xs font-semibold text-white hover:bg-brand-dark"
                       >
                         Review
                       </Link>

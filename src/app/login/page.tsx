@@ -11,21 +11,25 @@ export default async function LoginPage() {
   }
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-white px-4">
+    <main className="flex min-h-screen items-center justify-center px-4 py-10">
+      <div
+        aria-hidden
+        className="bg-hero-gradient pointer-events-none absolute inset-x-0 top-0 -z-10 h-72"
+      />
       <div className="w-full max-w-md">
         <div className="mb-8 text-center">
-          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full border-2 border-black">
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-white/20 text-white shadow-lg backdrop-blur ring-1 ring-white/30">
             <span className="text-lg font-bold tracking-tight">WU</span>
           </div>
-          <h1 className="text-2xl font-bold tracking-tight text-black">
+          <h1 className="text-2xl font-bold tracking-tight text-white">
             Postgraduate Portal
           </h1>
-          <p className="mt-1 text-sm text-neutral-500">
+          <p className="mt-1 text-sm text-white/80">
             University of Wayamba — sign in to continue
           </p>
         </div>
 
-        <div className="rounded-lg border border-border bg-white p-6 shadow-sm">
+        <div className="card-shadow rounded-2xl border border-border bg-white p-6">
           <LoginForm />
         </div>
 
@@ -33,7 +37,7 @@ export default async function LoginPage() {
           New postgraduate applicant?{" "}
           <Link
             href="/register"
-            className="font-semibold text-black underline underline-offset-4"
+            className="font-semibold text-brand underline underline-offset-4"
           >
             Register here
           </Link>

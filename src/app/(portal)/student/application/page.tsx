@@ -82,7 +82,7 @@ export default async function Page() {
                         Submitted {new Date(report.submittedAt).toLocaleString()}
                       </p>
                     </div>
-                    <span className="rounded bg-black px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white">
+                    <span className="rounded bg-brand px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white">
                       {report.reviews[0]?.status ?? "PENDING"}
                     </span>
                   </div>

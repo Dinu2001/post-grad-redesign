@@ -55,7 +55,7 @@ export function AssignPresentationForm({ applicationId }: { applicationId: numbe
           value={date}
           onChange={(e) => setDate(e.target.value)}
           required
-          className="mt-2 w-full rounded-md border border-border bg-white px-3 py-2 text-sm outline-none focus:border-black"
+          className="mt-2 w-full rounded-md border border-border bg-white px-3 py-2 text-sm outline-none focus:border-brand"
         />
         <p className="mt-1 text-xs text-neutral-600">
           Select the date and time for the presentation
@@ -71,7 +71,7 @@ export function AssignPresentationForm({ applicationId }: { applicationId: numbe
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="e.g., Research Proposal Defense"
-          className="mt-2 w-full rounded-md border border-border bg-white px-3 py-2 text-sm outline-none focus:border-black"
+          className="mt-2 w-full rounded-md border border-border bg-white px-3 py-2 text-sm outline-none focus:border-brand"
         />
       </div>
 
@@ -79,13 +79,13 @@ export function AssignPresentationForm({ applicationId }: { applicationId: numbe
         <button
           type="submit"
           disabled={pending}
-          className="rounded-md bg-black px-4 py-2 text-sm font-semibold text-white hover:bg-neutral-800 disabled:opacity-50"
+          className="rounded-md bg-brand px-4 py-2 text-sm font-semibold text-white hover:bg-brand-dark disabled:opacity-50"
         >
           {pending ? "Assigning..." : "Assign Date"}
         </button>
         <Link
           href="/registrar/presentations"
-          className="rounded-md border border-border px-4 py-2 text-sm font-semibold text-black hover:border-black"
+          className="rounded-md border border-border px-4 py-2 text-sm font-semibold text-black hover:border-brand"
         >
           Cancel
         </Link>

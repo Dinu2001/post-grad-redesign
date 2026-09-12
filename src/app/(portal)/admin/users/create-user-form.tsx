@@ -7,7 +7,7 @@ import { createStaffUser } from "./actions";
 type FacultyOption = { id: number; name: string };
 
 const inputClass =
-  "w-full rounded-md border border-border bg-white px-3 py-2 text-sm text-black outline-none focus:border-black focus:ring-1 focus:ring-black";
+  "w-full rounded-md border border-border bg-white px-3 py-2 text-sm text-black outline-none focus:border-brand focus:ring-1 focus:ring-brand";
 
 export function CreateUserForm({ faculties }: { faculties: FacultyOption[] }) {
   const router = useRouter();
@@ -78,7 +78,7 @@ export function CreateUserForm({ faculties }: { faculties: FacultyOption[] }) {
           <button
             type="submit"
             disabled={pending}
-            className="rounded-md bg-black px-4 py-2 text-sm font-semibold text-white transition hover:bg-neutral-800 disabled:opacity-50"
+            className="rounded-md bg-brand px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-dark disabled:opacity-50"
           >
             {pending ? "Creating…" : "Create user"}
           </button>
@@ -86,12 +86,12 @@ export function CreateUserForm({ faculties }: { faculties: FacultyOption[] }) {
       </form>
 
       {error && (
-        <p className="mt-3 rounded-md border border-black bg-neutral-50 px-3 py-2 text-sm text-black">
+        <p className="mt-3 rounded-md border border-brand bg-neutral-50 px-3 py-2 text-sm text-black">
           {error}
         </p>
       )}
       {created && (
-        <div className="mt-3 rounded-md border border-black bg-neutral-50 px-3 py-2 text-sm text-black">
+        <div className="mt-3 rounded-md border border-brand bg-neutral-50 px-3 py-2 text-sm text-black">
           <p className="font-semibold">User created.</p>
           <p>
             Email: <span className="font-mono">{created.email}</span>

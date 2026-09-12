@@ -12,8 +12,8 @@ import { SubmitForm } from "./submit-form";
 export const dynamic = "force-dynamic";
 
 const STATUS_BADGE: Record<WindowStatus, string> = {
-  submitted: "bg-black text-white",
-  open: "border border-black text-black",
+  submitted: "bg-brand text-white",
+  open: "border border-brand text-black",
   overdue: "bg-neutral-800 text-white",
   upcoming: "bg-neutral-200 text-neutral-600",
 };

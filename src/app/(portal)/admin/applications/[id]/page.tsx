@@ -135,7 +135,7 @@ export default async function ApprovedApplicationPage({
                       <div className="flex items-center gap-2">
                         <p className="font-medium text-black">{sup.supervisor.name}</p>
                         {sup.isMain && (
-                          <span className="rounded bg-black px-1.5 py-0.5 text-[10px] font-semibold text-white">
+                          <span className="rounded bg-brand px-1.5 py-0.5 text-[10px] font-semibold text-white">
                             MAIN
                           </span>
                         )}

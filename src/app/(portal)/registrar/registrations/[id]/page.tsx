@@ -199,7 +199,7 @@ export default async function Page({
               <p className="font-medium text-black">
                 {s.supervisor.name}{" "}
                 {s.isMain && (
-                  <span className="ml-1 rounded bg-black px-1.5 py-0.5 text-[10px] font-semibold text-white">
+                  <span className="ml-1 rounded bg-brand px-1.5 py-0.5 text-[10px] font-semibold text-white">
                     MAIN
                   </span>
                 )}
@@ -217,7 +217,7 @@ export default async function Page({
         {!decided ? (
           <RegistrationDecision applicationId={app.id} />
         ) : app.status === "APPROVED" ? (
-          <div className="rounded-lg border border-black bg-neutral-50 p-4">
+          <div className="rounded-lg border border-brand bg-neutral-50 p-4">
             <h3 className="text-base font-bold text-black">
               Approved — student login credentials
             </h3>

@@ -1,17 +1,94 @@
+import Link from "next/link";
 import { requireRole } from "@/lib/guard";
-import { PageHeader, PlaceholderCard } from "@/components/page-header";
+import { prisma } from "@/lib/prisma";
+import { PageHeader } from "@/components/page-header";
+import { StatCard, ChartCard, DonutChart } from "@/components/charts";
+
+export const dynamic = "force-dynamic";
 
 export default async function FacultyAdminDashboard() {
   const session = await requireRole("FACULTY_ADMIN");
+
+  const profile = await prisma.facultyAdminProfile.findUnique({
+    where: { userId: session.userId },
+    select: { faculty: true },
+  });
+  const faculty = profile?.faculty ?? undefined;
+
+  const where = faculty ? { faculty } : {};
+  const [active, approved, rejected] = await Promise.all([
+    prisma.applicationPostGraduate.count({
+      where: { ...where, status: "ACTIVE" },
+    }),
+    prisma.applicationPostGraduate.count({
+      where: { ...where, status: "APPROVED" },
+    }),
+    prisma.applicationPostGraduate.count({
+      where: { ...where, status: "REJECTED" },
+    }),
+  ]);
+
   return (
     <>
       <PageHeader
         title={`Welcome, ${session.fullName}`}
-        subtitle="Faculty Admin — review and sign off registrar-approved applications for your faculty."
+        subtitle={
+          faculty
+            ? `Faculty Admin — ${faculty}: sign off registrar-approved applications.`
+            : "Faculty Admin — sign off registrar-approved applications."
+        }
       />
-      <PlaceholderCard>
-        Faculty application queue will appear here.
-      </PlaceholderCard>
+
+      <div className="grid gap-4 sm:grid-cols-3">
+        <StatCard
+          label="Awaiting sign-off"
+          value={active}
+          accent="from-amber-500 to-orange-500"
+        />
+        <StatCard
+          label="Approved"
+          value={approved}
+          accent="from-emerald-500 to-teal-500"
+        />
+        <StatCard
+          label="Rejected"
+          value={rejected}
+          accent="from-rose-500 to-pink-500"
+        />
+      </div>
+
+      <div className="mt-4 grid gap-4 lg:grid-cols-2">
+        <ChartCard
+          title="Faculty applications"
+          subtitle={faculty ?? "All faculties"}
+        >
+          <DonutChart
+            centerLabel="Applications"
+            data={[
+              { label: "Awaiting", value: active, color: "#f59e0b" },
+              { label: "Approved", value: approved, color: "#10b981" },
+              { label: "Rejected", value: rejected, color: "#f43f5e" },
+            ]}
+          />
+        </ChartCard>
+
+        <ChartCard title="Quick actions" subtitle="Faculty review tasks">
+          <div className="space-y-3">
+            <Link
+              href="/faculty-admin/applications"
+              className="block rounded-xl border border-border bg-brand-light/40 px-4 py-3 text-sm font-semibold text-brand-dark transition hover:bg-brand hover:text-white"
+            >
+              Review applications →
+            </Link>
+            <Link
+              href="/faculty-admin/rejected"
+              className="block rounded-xl border border-border bg-white px-4 py-3 text-sm font-semibold text-neutral-700 transition hover:bg-muted"
+            >
+              View rejected →
+            </Link>
+          </div>
+        </ChartCard>
+      </div>
     </>
   );
 }

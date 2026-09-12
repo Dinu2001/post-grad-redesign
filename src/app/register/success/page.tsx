@@ -9,7 +9,7 @@ export default async function RegisterSuccessPage({
   return (
     <main className="min-h-screen flex items-center justify-center bg-white px-4">
       <div className="w-full max-w-lg text-center">
-        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full border-2 border-black text-2xl font-bold">
+        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full border-2 border-brand text-2xl font-bold">
           ✓
         </div>
         <h1 className="text-2xl font-bold tracking-tight text-black">
@@ -28,7 +28,7 @@ export default async function RegisterSuccessPage({
         </p>
         <Link
           href="/login"
-          className="mt-6 inline-block rounded-md border border-black px-4 py-2 text-sm font-semibold text-black transition hover:bg-black hover:text-white"
+          className="mt-6 inline-block rounded-md border border-brand px-4 py-2 text-sm font-semibold text-black transition hover:bg-brand hover:text-white"
         >
           Go to sign in
         </Link>

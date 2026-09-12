@@ -72,7 +72,7 @@ export default async function Page({
 
       <div className="space-y-4">
         {/* Rejection reason — most important for follow-up. */}
-        <div className="rounded-lg border border-black bg-neutral-50 p-4">
+        <div className="rounded-lg border border-brand bg-neutral-50 p-4">
           <h3 className="mb-1 text-base font-bold text-black">Reason for rejection</h3>
           <p className="text-sm text-black">
             {rejection?.registrarComment || "No reason was recorded."}

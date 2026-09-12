@@ -100,7 +100,7 @@ export default async function SupervisorPresentationsPage() {
                   </div>
                   <Link
                     href={`/supervisor/presentations/${pres.id}`}
-                    className="rounded-md bg-black px-3 py-1.5 text-xs font-semibold text-white hover:bg-neutral-800"
+                    className="rounded-md bg-brand px-3 py-1.5 text-xs font-semibold text-white hover:bg-brand-dark"
                   >
                     View
                   </Link>
