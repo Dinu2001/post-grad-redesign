@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { requireRole } from "@/lib/guard";
 import { getStudentApplication } from "@/lib/student";
 import { progressSchedule, windowStatus, canSubmit } from "@/lib/progress";
+import { notifySupervisor } from "@/lib/notify";
 
 export type SubmitResult = { ok: true } | { ok: false; error: string };
 
@@ -63,6 +64,15 @@ export async function submitProgressReport(input: {
       },
     },
   });
+
+  // Notify each assigned supervisor that a new progress report is ready to review.
+  for (const link of proposal.supervisors) {
+    await notifySupervisor(link.supervisorId, {
+      title: "Progress report submitted",
+      message: `${app.fullName} submitted their "${win.label}" progress report for review.`,
+      applicationId: app.id,
+    });
+  }
 
   revalidatePath("/student/progress");
   revalidatePath("/student");

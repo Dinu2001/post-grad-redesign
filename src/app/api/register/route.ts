@@ -3,6 +3,7 @@ import { z } from "zod";
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { durationYears } from "@/lib/duration";
+import { notifySupervisor, notifyFacultyAdmins, notifyRole } from "@/lib/notify";
 
 const fileSchema = z.object({
   path: z.string().min(1),
@@ -322,6 +323,40 @@ export async function POST(request: Request) {
           status: "PENDING",
         },
       });
+
+      // Notify the relevant parties about the new registration.
+      // 1) Each selected supervisor — "a student picked you as supervisor".
+      for (const s of d.supervisors) {
+        await notifySupervisor(
+          s.supervisorId,
+          {
+            title: "New student registration",
+            message: `${app.fullName} has registered and selected you as ${s.isMain ? "their main supervisor" : "a supervisor"} for "${proposal.title}".`,
+            applicationId: app.id,
+          },
+          tx,
+        );
+      }
+      // 2) Faculty admin(s) of the applicant's faculty.
+      await notifyFacultyAdmins(
+        faculty.name,
+        {
+          title: "New student registration",
+          message: `${app.fullName} has submitted a new registration in ${faculty.name}.`,
+          applicationId: app.id,
+        },
+        tx,
+      );
+      // 3) Registrar(s) — a registration is pending review.
+      await notifyRole(
+        "REGISTRAR",
+        {
+          title: "Registration pending review",
+          message: `${app.fullName}'s registration is pending your review.`,
+          applicationId: app.id,
+        },
+        tx,
+      );
 
       return app;
     });

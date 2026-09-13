@@ -32,6 +32,8 @@ export type SupervisorOption = {
   name: string;
   title: string | null;
   university: string | null;
+  // Faculty this supervisor belongs to; null = available to all faculties.
+  facultyId: number | null;
 };
 
 type Supervisor = {
@@ -121,6 +123,15 @@ export function RegistrationWizard({
     [departments, form.departmentId],
   );
   const selectedDegree = degrees.find((d) => d.id === form.degreeId) ?? null;
+
+  // Supervisors available for the chosen faculty (plus faculty-agnostic ones).
+  const availableSupervisors = useMemo(
+    () =>
+      supervisorOptions.filter(
+        (o) => o.facultyId == null || o.facultyId === form.facultyId,
+      ),
+    [supervisorOptions, form.facultyId],
+  );
 
   function validateStep(s: number): string | null {
     if (s === 0) {
@@ -267,7 +278,7 @@ export function RegistrationWizard({
         {step === 2 && <StepWorks form={form} set={set} />}
         {step === 3 && <StepProfessionals form={form} set={set} />}
         {step === 4 && <StepDocuments form={form} set={set} />}
-        {step === 5 && <StepProposal form={form} set={set} supervisorOptions={supervisorOptions} />}
+        {step === 5 && <StepProposal form={form} set={set} supervisorOptions={availableSupervisors} />}
         {step === 6 && (
           <StepReview
             form={form}
@@ -335,7 +346,14 @@ function StepPersonal({
               className={input}
               value={form.facultyId ?? ""}
               onChange={(e) =>
-                set({ facultyId: Number(e.target.value) || null, departmentId: null, degreeId: null })
+                // Reset dependent selections, incl. supervisors, since the
+                // available supervisor list is faculty-specific.
+                set({
+                  facultyId: Number(e.target.value) || null,
+                  departmentId: null,
+                  degreeId: null,
+                  supervisors: [{ supervisorId: null, isMain: true, cv: null, consent: null }],
+                })
               }
             >
               <option value="">Select faculty…</option>

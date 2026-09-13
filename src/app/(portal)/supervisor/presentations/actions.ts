@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { requireRole } from "@/lib/guard";
+import { notifyRole } from "@/lib/notify";
 
 export type MarkPresentationDoneResult =
   | { ok: true }
@@ -70,13 +71,10 @@ export async function markPresentationDone(
       data: { isDone: true },
     });
 
-    // Create notification for registrar
-    await prisma.notification.create({
-      data: {
-        title: "Presentation Completed",
-        message: `Presentation for ${presentation.proposal.application.fullName} has been marked as completed and is awaiting your review.`,
-        adminId: 1, // TODO: Get current admin's ID or notify all admins
-      },
+    // Notify all registrars that the presentation is awaiting their review.
+    await notifyRole("REGISTRAR", {
+      title: "Presentation Completed",
+      message: `Presentation for ${presentation.proposal.application.fullName} has been marked as completed and is awaiting your review.`,
     });
 
     revalidatePath("/supervisor/presentations");

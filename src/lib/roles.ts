@@ -29,12 +29,13 @@ export const ROLE_NAV: Record<UserRole, NavLink[]> = {
     { label: "My Application", href: "/student/application" },
     { label: "Research Proposal", href: "/student/proposal" },
     { label: "Progress Reports", href: "/student/progress" },
+    { label: "Supervisors", href: "/student/supervisors" },
     { label: "Presentations", href: "/student/presentations" },
   ],
   SUPERVISOR: [
     { label: "Dashboard", href: "/supervisor" },
     { label: "My Students", href: "/supervisor/students" },
-    { label: "Progress Reviews", href: "/supervisor/reviews" },
+    { label: "Progress Review", href: "/supervisor/reviews" },
     { label: "Presentations", href: "/supervisor/presentations" },
   ],
   REGISTRAR: [
@@ -48,6 +49,7 @@ export const ROLE_NAV: Record<UserRole, NavLink[]> = {
   MAIN_ADMIN: [
     { label: "Dashboard", href: "/admin" },
     { label: "Applications", href: "/admin/applications" },
+    { label: "Student Progress", href: "/admin/progress" },
     { label: "Faculties & Degrees", href: "/admin/structure" },
     { label: "Supervisors", href: "/admin/supervisors" },
     { label: "Users", href: "/admin/users" },
@@ -56,6 +58,7 @@ export const ROLE_NAV: Record<UserRole, NavLink[]> = {
   FACULTY_ADMIN: [
     { label: "Dashboard", href: "/faculty-admin" },
     { label: "Applications", href: "/faculty-admin/applications" },
+    { label: "Student Progress", href: "/faculty-admin/progress" },
     { label: "Rejected", href: "/faculty-admin/rejected" },
   ],
 };

@@ -31,7 +31,7 @@ export default async function RegisterPage() {
     }),
     prisma.supervisorProfile.findMany({
       orderBy: { name: "asc" },
-      select: { id: true, name: true, title: true, university: true },
+      select: { id: true, name: true, title: true, university: true, facultyId: true },
     }),
   ]);
 
@@ -40,6 +40,7 @@ export default async function RegisterPage() {
     name: s.name,
     title: s.title,
     university: s.university,
+    facultyId: s.facultyId,
   }));
 
   return (

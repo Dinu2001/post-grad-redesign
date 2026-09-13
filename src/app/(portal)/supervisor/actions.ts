@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { requireRole } from "@/lib/guard";
+import { notifyUser, notifyFacultyAdmins, notifyRole } from "@/lib/notify";
 
 export type ActionResult = { ok: true } | { ok: false; error: string };
 
@@ -30,9 +31,14 @@ export async function submitSupervisorReview(form: FormData): Promise<ActionResu
     where: { id: progressId },
     select: {
       id: true,
+      title: true,
+      completedAt: true,
       proposal: {
         select: {
           supervisors: { select: { supervisorId: true } },
+          application: {
+            select: { id: true, userId: true, fullName: true, faculty: true },
+          },
         },
       },
     },
@@ -78,7 +84,59 @@ export async function submitSupervisorReview(form: FormData): Promise<ActionResu
     });
   }
 
+  const application = report.proposal.application;
+  const studentUserId = application?.userId;
+
+  // Let the student know their report has been reviewed.
+  if (studentUserId) {
+    await notifyUser(studentUserId, {
+      title: "Progress report reviewed",
+      message: `Your supervisor ${status === "APPROVED" ? "approved" : "requested changes on"} "${report.title}".`,
+      applicationId: application?.id ?? null,
+    });
+  }
+
+  // If every assigned supervisor has now APPROVED this report, the progress
+  // stage is complete: record it and notify the student, faculty admins and
+  // registrars. Only fires once (guarded by completedAt).
+  const assignedIds = report.proposal.supervisors.map((s) => s.supervisorId);
+  if (status === "APPROVED" && assignedIds.length > 0 && !report.completedAt) {
+    const approvedCount = await prisma.supervisorProgressReview.count({
+      where: {
+        progressId,
+        supervisorId: { in: assignedIds },
+        status: "APPROVED",
+      },
+    });
+    if (approvedCount === assignedIds.length) {
+      await prisma.progressReport.update({
+        where: { id: progressId },
+        data: { completedAt: new Date() },
+      });
+      const studentName = application?.fullName ?? "The student";
+      if (studentUserId) {
+        await notifyUser(studentUserId, {
+          title: "Progress stage complete",
+          message: `All supervisors have approved "${report.title}". This progress stage is now complete.`,
+          applicationId: application?.id ?? null,
+        });
+      }
+      await notifyFacultyAdmins(application?.faculty, {
+        title: "Progress stage complete",
+        message: `${studentName}'s "${report.title}" has been approved by all supervisors.`,
+        applicationId: application?.id ?? null,
+      });
+      await notifyRole("REGISTRAR", {
+        title: "Progress stage complete",
+        message: `${studentName}'s "${report.title}" has been approved by all supervisors.`,
+        applicationId: application?.id ?? null,
+      });
+    }
+  }
+
   revalidatePath("/supervisor/reviews");
+  revalidatePath("/admin/progress");
+  revalidatePath("/faculty-admin/progress");
   revalidatePath("/supervisor");
   revalidatePath("/student/progress");
   return { ok: true };

@@ -42,6 +42,7 @@ export async function createSupervisor(form: FormData): Promise<ActionResult> {
           title: str(form, "title") || null,
           university: str(form, "university") || null,
           telephone: str(form, "telephone") || null,
+          facultyId: Number(form.get("facultyId")) || null,
         },
       });
 
@@ -85,6 +86,7 @@ export async function updateSupervisor(form: FormData): Promise<ActionResult> {
       title: str(form, "title") || null,
       university: str(form, "university") || null,
       telephone: str(form, "telephone") || null,
+      facultyId: Number(form.get("facultyId")) || null,
     },
   });
   revalidatePath("/admin/supervisors");

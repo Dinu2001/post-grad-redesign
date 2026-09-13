@@ -3,7 +3,11 @@
     "allow": [
       "Bash(node -e \"console.log\\(require\\('crypto'\\).randomBytes\\(32\\).toString\\('hex'\\)\\)\")",
       "Bash(npx next *)",
-      "Bash(npx eslint *)"
+      "Bash(npx eslint *)",
+      "Bash(npx prisma *)",
+      "Bash(echo \"exit:$?\")",
+      "Bash(node --env-file=.env \"C:\\\\Users\\\\ASUS\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\d--My-Projects-post-grad-redesign\\\\db1d3010-66fc-494c-8fcb-d75cd9cf924e\\\\scratchpad\\\\smtp-test.mjs\")",
+      "Bash(node --env-file=.env _smtp-test.mjs)"
     ]
   }
 }

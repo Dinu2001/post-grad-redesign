@@ -38,6 +38,7 @@ export async function assignPresentationDate(
     select: {
       status: true,
       fullName: true,
+      userId: true,
       emails: true,
       researchProposals: {
         select: {
@@ -84,12 +85,14 @@ export async function assignPresentationDate(
       },
     });
 
-    // Create notification for student
+    // Create notification for student (visible in their panel once they have
+    // a portal account).
     await prisma.notification.create({
       data: {
         title: "Presentation Date Assigned",
         message: `Your presentation has been scheduled for ${presentationDate.toLocaleDateString()}`,
         applicationId,
+        recipientUserId: app.userId ?? undefined,
       },
     });
 
@@ -248,6 +251,7 @@ export async function approvePresentationResult(
           title: "Postgraduate Approval",
           message: "Your presentation has been approved. You are now registered as a postgraduate student.",
           applicationId: application.id,
+          recipientUserId: userId,
         },
       });
     });

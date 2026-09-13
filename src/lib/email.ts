@@ -3,7 +3,7 @@
  * Currently implements logging/mock; integrate with your email provider (SendGrid, AWS SES, etc.)
  */
 
-import { prisma } from "./prisma";
+import nodemailer, { type Transporter } from "nodemailer";
 
 export interface EmailData {
   to: string;
@@ -13,21 +13,55 @@ export interface EmailData {
 }
 
 /**
- * Send an email. Replace this with actual email provider integration.
+ * SMTP email delivery (defaults tuned for Gmail). Configure with env vars:
+ *   SMTP_HOST  — SMTP server host (default: smtp.gmail.com)
+ *   SMTP_PORT  — port (default: 465, SSL). Use 587 for STARTTLS.
+ *   SMTP_USER  — your full email address (e.g. youruni@gmail.com)
+ *   SMTP_PASS  — Gmail App Password (16 chars, NOT your normal password)
+ *   EMAIL_FROM — optional "Display Name <address>"; defaults to SMTP_USER
+ *
+ * When SMTP_USER / SMTP_PASS are not set, emails are logged to the console so
+ * local development still works without credentials.
  */
+let transporter: Transporter | null = null;
+
+function getTransporter(): Transporter | null {
+  const user = process.env.SMTP_USER;
+  const pass = process.env.SMTP_PASS;
+  if (!user || !pass) return null;
+
+  if (!transporter) {
+    const port = Number(process.env.SMTP_PORT ?? 465);
+    transporter = nodemailer.createTransport({
+      host: process.env.SMTP_HOST ?? "smtp.gmail.com",
+      port,
+      secure: port === 465, // 465 = implicit SSL; 587 = STARTTLS
+      auth: { user, pass },
+    });
+  }
+  return transporter;
+}
+
 async function sendEmail(data: EmailData): Promise<boolean> {
+  const tx = getTransporter();
+  const from = process.env.EMAIL_FROM || process.env.SMTP_USER || "";
+
+  if (!tx) {
+    console.log(`[EMAIL:dev] To: ${data.to}`);
+    console.log(`[EMAIL:dev] Subject: ${data.subject}`);
+    console.log(`[EMAIL:dev] Body: ${data.text || data.html}`);
+    console.log("[EMAIL:dev] SMTP_USER/SMTP_PASS not set — email not actually sent.");
+    return true;
+  }
+
   try {
-    // TODO: Integrate with SendGrid, AWS SES, Nodemailer, or other provider
-    // Example with SendGrid:
-    // const sgMail = require('@sendgrid/mail');
-    // sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-    // await sgMail.send({ ...data, from: 'noreply@university.edu' });
-
-    // For now, just log it
-    console.log(`[EMAIL] To: ${data.to}`);
-    console.log(`[EMAIL] Subject: ${data.subject}`);
-    console.log(`[EMAIL] Body: ${data.text || data.html}`);
-
+    await tx.sendMail({
+      from,
+      to: data.to,
+      subject: data.subject,
+      html: data.html,
+      text: data.text,
+    });
     return true;
   } catch (error) {
     console.error("Failed to send email:", error);

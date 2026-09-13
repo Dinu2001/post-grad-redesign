@@ -103,6 +103,7 @@ model PortalUser {
   admin        AdminProfile?
   facultyAdmin FacultyAdminProfile?
   registrar    RegistrarProfile?
+  notifications Notification[]
 
   @@map("user")
 }
@@ -152,6 +153,10 @@ model SupervisorProfile {
   university String?    @map("university")
   telephone  String?    @map("telephone")
   cvFile     String?    @map("cv_file")
+  // Faculty this supervisor belongs to. Null = available to all faculties.
+  // Registration filters the selectable supervisors by the applicant's faculty.
+  facultyId  Int?       @map("faculty_id")
+  facultyRef Faculty?   @relation(fields: [facultyId], references: [id], onDelete: SetNull)
 
   proposals         ProposalSupervisor[]
   reviews           SupervisorProgressReview[]
@@ -176,6 +181,7 @@ model Faculty {
   departments   Department[]
   applications  ApplicationPostGraduate[]
   facultyAdmins FacultyAdminProfile[]
+  supervisors   SupervisorProfile[]
 
   @@map("faculty")
 }
@@ -463,6 +469,9 @@ model ProgressReport {
   title       String                  @map("title")
   description String?                 @map("description")
   submittedAt DateTime                @default(now()) @map("submitted_at")
+  // Set when every assigned supervisor has APPROVED this report — the progress
+  // stage is then considered complete. Null while still awaiting approvals.
+  completedAt DateTime?               @map("completed_at")
 
   files         ProgressReportFile[]
   reviews       SupervisorProgressReview[]
@@ -525,6 +534,13 @@ model Notification {
   supervisor    SupervisorProfile?       @relation(fields: [supervisorId], references: [id], onDelete: Cascade)
   adminId       Int?                     @map("admin_id")
   admin         AdminProfile?            @relation(fields: [adminId], references: [id], onDelete: Cascade)
+  // Generic recipient: any portal user (student, faculty admin, registrar,
+  // main admin). Preferred target for new notifications. supervisorId is kept
+  // for supervisor-scoped notifications routed via their profile.
+  recipientUserId Int?                   @map("recipient_user_id")
+  recipient     PortalUser?              @relation(fields: [recipientUserId], references: [id], onDelete: Cascade)
 
+  @@index([recipientUserId, isRead])
+  @@index([supervisorId, isRead])
   @@map("notification")
 }

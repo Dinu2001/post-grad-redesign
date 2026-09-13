@@ -8,19 +8,24 @@ export const dynamic = "force-dynamic";
 export default async function SupervisorsPage() {
   await requireRole("MAIN_ADMIN");
 
-  const supervisors = await prisma.supervisorProfile.findMany({
-    orderBy: { name: "asc" },
-    select: {
-      id: true,
-      name: true,
-      title: true,
-      university: true,
-      telephone: true,
-      userId: true,
-      user: { select: { email: true, initialPassword: true, mustChangePassword: true } },
-      _count: { select: { proposals: true } },
-    },
-  });
+  const [supervisors, faculties] = await Promise.all([
+    prisma.supervisorProfile.findMany({
+      orderBy: { name: "asc" },
+      select: {
+        id: true,
+        name: true,
+        title: true,
+        university: true,
+        telephone: true,
+        facultyId: true,
+        facultyRef: { select: { name: true } },
+        userId: true,
+        user: { select: { email: true, initialPassword: true, mustChangePassword: true } },
+        _count: { select: { proposals: true } },
+      },
+    }),
+    prisma.faculty.findMany({ orderBy: { name: "asc" }, select: { id: true, name: true } }),
+  ]);
 
   const rows: SupervisorRow[] = supervisors.map((s) => ({
     id: s.id,
@@ -28,6 +33,8 @@ export default async function SupervisorsPage() {
     title: s.title,
     university: s.university,
     telephone: s.telephone,
+    facultyId: s.facultyId,
+    facultyName: s.facultyRef?.name ?? null,
     hasAccount: s.userId != null,
     email: s.user?.email,
     initialPassword: s.user?.initialPassword,
@@ -41,7 +48,7 @@ export default async function SupervisorsPage() {
         title="Supervisors"
         subtitle="Maintain the list of supervisors students can select in the research-proposal step of registration."
       />
-      <SupervisorManager supervisors={rows} />
+      <SupervisorManager supervisors={rows} faculties={faculties} />
     </>
   );
 }

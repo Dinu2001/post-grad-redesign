@@ -9,12 +9,16 @@ import {
   type ActionResult,
 } from "./actions";
 
+export type FacultyOption = { id: number; name: string };
+
 export type SupervisorRow = {
   id: number;
   name: string;
   title: string | null;
   university: string | null;
   telephone: string | null;
+  facultyId: number | null;
+  facultyName: string | null;
   hasAccount: boolean;
   email?: string;
   initialPassword?: string | null;
@@ -48,10 +52,16 @@ function useAction() {
   return { pending, error, run };
 }
 
-export function SupervisorManager({ supervisors }: { supervisors: SupervisorRow[] }) {
+export function SupervisorManager({
+  supervisors,
+  faculties,
+}: {
+  supervisors: SupervisorRow[];
+  faculties: FacultyOption[];
+}) {
   return (
     <div className="space-y-6">
-      <AddSupervisor />
+      <AddSupervisor faculties={faculties} />
       {supervisors.length === 0 ? (
         <div className="rounded-lg border border-dashed border-border bg-white p-8 text-center text-sm text-neutral-500">
           No supervisors yet. Add them above so students can select them during
@@ -63,6 +73,7 @@ export function SupervisorManager({ supervisors }: { supervisors: SupervisorRow[
             <thead className="border-b border-border bg-muted text-xs uppercase tracking-wide text-neutral-500">
               <tr>
                 <th className="px-4 py-2 font-semibold">Name</th>
+                <th className="px-4 py-2 font-semibold">Faculty</th>
                 <th className="px-4 py-2 font-semibold">Title</th>
                 <th className="px-4 py-2 font-semibold">University</th>
                 <th className="px-4 py-2 font-semibold">Telephone</th>
@@ -71,7 +82,7 @@ export function SupervisorManager({ supervisors }: { supervisors: SupervisorRow[
             </thead>
             <tbody>
               {supervisors.map((s) => (
-                <SupervisorRowItem key={s.id} s={s} />
+                <SupervisorRowItem key={s.id} s={s} faculties={faculties} />
               ))}
             </tbody>
           </table>
@@ -81,7 +92,26 @@ export function SupervisorManager({ supervisors }: { supervisors: SupervisorRow[
   );
 }
 
-function AddSupervisor() {
+function FacultySelect({
+  faculties,
+  defaultValue,
+}: {
+  faculties: FacultyOption[];
+  defaultValue?: number | null;
+}) {
+  return (
+    <select name="facultyId" defaultValue={defaultValue ?? ""} className={input}>
+      <option value="">All faculties</option>
+      {faculties.map((f) => (
+        <option key={f.id} value={f.id}>
+          {f.name}
+        </option>
+      ))}
+    </select>
+  );
+}
+
+function AddSupervisor({ faculties }: { faculties: FacultyOption[] }) {
   const { pending, error, run } = useAction();
   const [created, setCreated] = useState<{ email: string; tempPassword: string } | null>(null);
   return (
@@ -96,9 +126,10 @@ function AddSupervisor() {
       className="rounded-lg border border-border bg-white p-4"
     >
       <h3 className="mb-3 text-base font-bold text-black">Add supervisor</h3>
-      <div className="grid gap-3 sm:grid-cols-5">
+      <div className="grid gap-3 sm:grid-cols-3">
         <input name="name" placeholder="Full name *" className={input} required />
         <input name="email" type="email" placeholder="Email *" className={input} required />
+        <FacultySelect faculties={faculties} />
         <input name="title" placeholder="Title (e.g. Prof.)" className={input} />
         <input name="university" placeholder="University" className={input} />
         <input name="telephone" placeholder="Telephone" className={input} />
@@ -124,20 +155,21 @@ function AddSupervisor() {
   );
 }
 
-function SupervisorRowItem({ s }: { s: SupervisorRow }) {
+function SupervisorRowItem({ s, faculties }: { s: SupervisorRow; faculties: FacultyOption[] }) {
   const { pending, error, run } = useAction();
   const [editing, setEditing] = useState(false);
 
   if (editing) {
     return (
       <tr className="border-b border-border last:border-0">
-        <td colSpan={5} className="px-4 py-3">
+        <td colSpan={6} className="px-4 py-3">
           <form
             action={(fd) => run(updateSupervisor, fd, () => setEditing(false))}
-            className="grid items-center gap-2 sm:grid-cols-5"
+            className="grid items-center gap-2 sm:grid-cols-3"
           >
             <input type="hidden" name="id" value={s.id} />
             <input name="name" defaultValue={s.name} className={input} required />
+            <FacultySelect faculties={faculties} defaultValue={s.facultyId} />
             <input name="title" defaultValue={s.title ?? ""} className={input} placeholder="Title" />
             <input name="university" defaultValue={s.university ?? ""} className={input} placeholder="University" />
             <input name="telephone" defaultValue={s.telephone ?? ""} className={input} placeholder="Telephone" />
@@ -177,6 +209,7 @@ function SupervisorRowItem({ s }: { s: SupervisorRow }) {
           )}
         </div>
       </td>
+      <td className="px-4 py-2 text-neutral-600">{s.facultyName ?? "All"}</td>
       <td className="px-4 py-2 text-neutral-600">{s.title ?? "—"}</td>
       <td className="px-4 py-2 text-neutral-600">{s.university ?? "—"}</td>
       <td className="px-4 py-2 text-neutral-600">{s.telephone ?? "—"}</td>
