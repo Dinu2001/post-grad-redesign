@@ -11,13 +11,13 @@ export default async function LoginPage() {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center px-4 py-10">
+    <main className="relative flex min-h-screen items-start justify-center overflow-hidden px-4 py-10 sm:py-14">
       <div
         aria-hidden
-        className="bg-hero-gradient pointer-events-none absolute inset-x-0 top-0 -z-10 h-72"
+        className="login-background pointer-events-none absolute inset-0"
       />
-      <div className="w-full max-w-md">
-        <div className="mb-8 text-center">
+      <div className="relative z-10 w-full max-w-md">
+        <div className="mb-8 pt-1 text-center">
           <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-white/20 text-white shadow-lg backdrop-blur ring-1 ring-white/30">
             <span className="text-lg font-bold tracking-tight">WU</span>
           </div>
