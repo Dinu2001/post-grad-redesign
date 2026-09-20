@@ -78,7 +78,7 @@ body {
 
 .login-background {
   background-image: 
-    url("/wayamba-campus.jpg");
+    url("https://studyway-resources.s3.amazonaws.com/blogs/1738386156001.jpg");
   background-position: center;
   background-size: cover;
 }
