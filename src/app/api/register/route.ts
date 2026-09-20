@@ -324,44 +324,37 @@ export async function POST(request: Request) {
         },
       });
 
-      // Notify the relevant parties about the new registration.
-      // 1) Each selected supervisor — "a student picked you as supervisor".
+      return { app, proposal };
+    },
+    { timeout: 15000 },
+    );
+
+    // Notifications are deliberately sent after the registration commits so
+    // their recipient lookups cannot consume the registration transaction's
+    // timeout. A notification failure must not undo a valid application.
+    try {
       for (const s of d.supervisors) {
-        await notifySupervisor(
-          s.supervisorId,
-          {
-            title: "New student registration",
-            message: `${app.fullName} has registered and selected you as ${s.isMain ? "their main supervisor" : "a supervisor"} for "${proposal.title}".`,
-            applicationId: app.id,
-          },
-          tx,
-        );
-      }
-      // 2) Faculty admin(s) of the applicant's faculty.
-      await notifyFacultyAdmins(
-        faculty.name,
-        {
+        await notifySupervisor(s.supervisorId, {
           title: "New student registration",
-          message: `${app.fullName} has submitted a new registration in ${faculty.name}.`,
-          applicationId: app.id,
-        },
-        tx,
-      );
-      // 3) Registrar(s) — a registration is pending review.
-      await notifyRole(
-        "REGISTRAR",
-        {
-          title: "Registration pending review",
-          message: `${app.fullName}'s registration is pending your review.`,
-          applicationId: app.id,
-        },
-        tx,
-      );
+          message: `${result.app.fullName} has registered and selected you as ${s.isMain ? "their main supervisor" : "a supervisor"} for "${result.proposal.title}".`,
+          applicationId: result.app.id,
+        });
+      }
+      await notifyFacultyAdmins(faculty.name, {
+        title: "New student registration",
+        message: `${result.app.fullName} has submitted a new registration in ${faculty.name}.`,
+        applicationId: result.app.id,
+      });
+      await notifyRole("REGISTRAR", {
+        title: "Registration pending review",
+        message: `${result.app.fullName}'s registration is pending your review.`,
+        applicationId: result.app.id,
+      });
+    } catch (notificationError) {
+      console.error("Registration notification error:", notificationError);
+    }
 
-      return app;
-    });
-
-    return NextResponse.json({ ok: true, applicationId: result.id });
+    return NextResponse.json({ ok: true, applicationId: result.app.id });
   } catch (e) {
     if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === "P2002") {
       return NextResponse.json(
