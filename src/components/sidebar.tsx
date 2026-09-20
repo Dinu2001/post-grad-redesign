@@ -104,7 +104,7 @@ export function Sidebar({ role, fullName, email }: Props) {
     .toUpperCase();
 
   return (
-    <aside className="bg-hero-gradient flex h-screen w-64 shrink-0 flex-col text-white">
+    <aside className="bg-hero-gradient sticky top-0 flex h-screen w-64 shrink-0 flex-col self-start overflow-hidden text-white">
       <div className="flex items-center gap-3 border-b border-white/15 px-5 py-5">
         <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/15 backdrop-blur">
           <span className="text-sm font-bold tracking-tight">WU</span>

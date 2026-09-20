@@ -32,7 +32,7 @@ export default async function PortalLayout({
         fullName={session.fullName}
         email={session.email}
       />
-      <main className="flex-1 overflow-y-auto">
+      <main className="min-h-0 flex-1 overflow-y-auto">
         <header className="flex items-center justify-between border-b border-border bg-white px-8 py-3">
           <p className="text-sm font-semibold text-neutral-500">
             {ROLE_LABELS[session.role]} Portal
