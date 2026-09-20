@@ -5,6 +5,7 @@ import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { requireRole } from "@/lib/guard";
 import { hashPassword } from "@/lib/auth";
+import { nextUserCode } from "@/lib/user-code";
 import {
   sendStudentApprovalNotification,
   sendPasswordResetNotification,
@@ -79,8 +80,10 @@ export async function approveRegistration(
 
   try {
     await prisma.$transaction(async (tx) => {
+      const userCode = await nextUserCode(tx, "STUDENT");
       const user = await tx.portalUser.create({
         data: {
+          userCode,
           fullName: app.fullName,
           email,
           passwordHash,

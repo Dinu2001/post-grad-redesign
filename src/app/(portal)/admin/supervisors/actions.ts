@@ -5,6 +5,7 @@ import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { requireRole } from "@/lib/guard";
 import { hashPassword } from "@/lib/auth";
+import { nextUserCode } from "@/lib/user-code";
 
 export type ActionResult =
   | { ok: true; tempPassword?: string; email?: string }
@@ -46,8 +47,10 @@ export async function createSupervisor(form: FormData): Promise<ActionResult> {
         },
       });
 
+      const userCode = await nextUserCode(tx, "SUPERVISOR");
       const user = await tx.portalUser.create({
         data: {
+          userCode,
           fullName: name,
           email,
           passwordHash,

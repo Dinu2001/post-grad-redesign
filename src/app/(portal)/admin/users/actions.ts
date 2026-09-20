@@ -5,6 +5,7 @@ import { Prisma, type UserRole } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { requireRole } from "@/lib/guard";
 import { hashPassword } from "@/lib/auth";
+import { nextUserCode } from "@/lib/user-code";
 
 export type CreateUserResult =
   | { ok: true; tempPassword: string; email: string }
@@ -52,8 +53,10 @@ export async function createStaffUser(
 
   try {
     await prisma.$transaction(async (tx) => {
+      const userCode = await nextUserCode(tx, role);
       const user = await tx.portalUser.create({
         data: {
+          userCode,
           fullName,
           email,
           passwordHash,

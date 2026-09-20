@@ -12,6 +12,7 @@ export default async function UsersPage() {
       orderBy: { createdAt: "desc" },
       select: {
         id: true,
+        userCode: true,
         fullName: true,
         email: true,
         role: true,
@@ -38,6 +39,7 @@ export default async function UsersPage() {
           <table className="w-full text-left text-sm">
             <thead className="border-b border-border bg-muted text-xs uppercase tracking-wide text-neutral-500">
               <tr>
+                <th className="px-4 py-2 font-semibold">ID</th>
                 <th className="px-4 py-2 font-semibold">Name</th>
                 <th className="px-4 py-2 font-semibold">Email</th>
                 <th className="px-4 py-2 font-semibold">Role</th>
@@ -46,6 +48,9 @@ export default async function UsersPage() {
             <tbody>
               {users.map((u) => (
                 <tr key={u.id} className="border-b border-border last:border-0">
+                  <td className="px-4 py-2 font-mono text-xs font-semibold text-brand-dark">
+                    {u.userCode}
+                  </td>
                   <td className="px-4 py-2 font-medium text-black">
                     {u.fullName}
                   </td>

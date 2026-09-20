@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { requireRole } from "@/lib/guard";
 import { hashPassword } from "@/lib/auth";
+import { nextUserCode } from "@/lib/user-code";
 import {
   sendPresentationDateNotification,
   sendPresentationApprovedNotification,
@@ -218,8 +219,10 @@ export async function approvePresentationResult(
         const tempPassword = `WU-${crypto.getRandomValues(new Uint8Array(3)).reduce((acc, byte) => acc + byte.toString(16).padStart(2, "0"), "")}!`;
         generatedPassword = tempPassword;
 
+        const userCode = await nextUserCode(tx, "STUDENT");
         const user = await tx.portalUser.create({
           data: {
+            userCode,
             fullName: application.fullName,
             email: studentEmail,
             passwordHash: await hashPassword(tempPassword),

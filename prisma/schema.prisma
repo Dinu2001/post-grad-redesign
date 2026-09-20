@@ -86,6 +86,7 @@ model DegreeDuration {
 
 model PortalUser {
   id             Int      @id @default(autoincrement()) @map("user_id")
+  userCode       String   @unique @map("user_code")
   supabaseUserId String?  @unique @map("supabase_user_id")
   fullName       String   @map("full_name")
   email          String   @unique

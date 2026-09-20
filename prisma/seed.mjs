@@ -15,6 +15,7 @@ async function main() {
     where: { email: ADMIN_EMAIL },
     update: {},
     create: {
+      userCode: "STAFF001",
       fullName: "System Administrator",
       email: ADMIN_EMAIL,
       passwordHash,

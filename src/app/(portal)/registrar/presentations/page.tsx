@@ -54,6 +54,21 @@ export default async function PresentationsPage() {
         subtitle="Manage student presentations and review completion status."
       />
 
+      <div className="mb-5 flex flex-wrap gap-3">
+        <Link
+          href="/registrar/approved"
+          className="rounded-md border border-border bg-white px-3 py-2 text-sm font-semibold text-black hover:border-brand"
+        >
+          Approved students
+        </Link>
+        <Link
+          href="/registrar/presentations/completed"
+          className="rounded-md border border-border bg-white px-3 py-2 text-sm font-semibold text-black hover:border-brand"
+        >
+          Completed presentations
+        </Link>
+      </div>
+
       <div className="space-y-6">
         {/* Presentations Pending Assignment */}
         {withoutPresentation.length > 0 && (

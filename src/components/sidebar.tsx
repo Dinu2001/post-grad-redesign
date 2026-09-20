@@ -120,7 +120,13 @@ export function Sidebar({ role, fullName, email }: Props) {
           const active =
             pathname === link.href ||
             (link.href !== ROLE_NAV[role][0].href &&
-              pathname.startsWith(link.href));
+              pathname.startsWith(link.href) &&
+              !links.some(
+                (otherLink) =>
+                  otherLink.href !== link.href &&
+                  otherLink.href.startsWith(link.href) &&
+                  pathname.startsWith(otherLink.href),
+              ));
           return (
             <Link
               key={link.href}
