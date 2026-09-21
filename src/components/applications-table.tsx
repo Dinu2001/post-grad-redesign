@@ -35,8 +35,8 @@ export function ApplicationsTable({
   }
 
   return (
-    <div className="card-shadow overflow-hidden rounded-2xl border border-border bg-white">
-      <table className="w-full text-left text-sm">
+    <div className="card-shadow overflow-x-auto rounded-2xl border border-border bg-white">
+      <table className="w-full min-w-[48rem] text-left text-sm">
         <thead className="border-b border-border bg-brand-light text-xs uppercase tracking-wide text-brand-dark">
           <tr>
             <th className="px-4 py-3 font-semibold">Applicant</th>

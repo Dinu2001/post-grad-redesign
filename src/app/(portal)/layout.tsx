@@ -26,20 +26,22 @@ export default async function PortalLayout({
   const unread = notifications.filter((n) => !n.isRead).length;
 
   return (
-    <div className="flex min-h-screen bg-muted">
+    <div className="flex min-h-screen flex-col bg-muted md:flex-row">
       <Sidebar
         role={session.role}
         fullName={session.fullName}
         email={session.email}
       />
-      <main className="min-h-0 flex-1 overflow-y-auto">
-        <header className="flex items-center justify-between border-b border-border bg-white px-8 py-3">
+      <main className="min-h-0 min-w-0 flex-1 overflow-x-auto overflow-y-auto">
+        <header className="flex items-center justify-between gap-4 border-b border-border bg-white px-4 py-3 pl-16 sm:px-6 sm:pl-16 lg:px-8 lg:pl-8">
           <p className="text-sm font-semibold text-neutral-500">
             {ROLE_LABELS[session.role]} Portal
           </p>
           <NotificationBell items={notifications} unread={unread} />
         </header>
-        <div className="mx-auto max-w-6xl px-8 py-8">{children}</div>
+        <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
+          {children}
+        </div>
       </main>
     </div>
   );
