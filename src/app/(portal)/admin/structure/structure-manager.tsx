@@ -1,7 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
+import { useState } from "react";
 import type { DegreeLevel, StudyMode } from "@prisma/client";
 import {
   createDegree,
@@ -13,6 +12,7 @@ import {
   renameFaculty,
   type ActionResult,
 } from "./actions";
+import { useServerAction } from "@/components/use-server-action";
 
 export type DegreeNode = {
   id: number;
@@ -45,23 +45,15 @@ const ghostBtn =
   "rounded-md border border-border px-2.5 py-1 text-xs font-medium text-neutral-600 transition hover:border-brand hover:text-brand-dark disabled:opacity-50";
 
 function useAction() {
-  const router = useRouter();
-  const [pending, start] = useTransition();
-  const [error, setError] = useState<string | null>(null);
-
-  function run(action: (fd: FormData) => Promise<ActionResult>, fd: FormData, onDone?: () => void) {
-    setError(null);
-    start(async () => {
-      const res = await action(fd);
-      if (!res.ok) {
-        setError(res.error);
-        return;
-      }
-      onDone?.();
-      router.refresh();
-    });
+  const { run: runAction, ...action } = useServerAction();
+  function run(
+    serverAction: (fd: FormData) => Promise<ActionResult>,
+    fd: FormData,
+    onDone?: () => void,
+  ) {
+    runAction({ action: () => serverAction(fd), onSuccess: onDone });
   }
-  return { pending, error, run, setError };
+  return { ...action, run };
 }
 
 export function StructureManager({ faculties }: { faculties: FacultyNode[] }) {

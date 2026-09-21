@@ -1,8 +1,8 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useState } from "react";
 import { submitSupervisorReview } from "./actions";
+import { useServerAction } from "@/components/use-server-action";
 
 export function ReviewForm({
   progressId,
@@ -15,26 +15,18 @@ export function ReviewForm({
   initialStatus?: string | null;
   reviewedAt?: Date | null;
 }) {
-  const router = useRouter();
-  const [pending, start] = useTransition();
+  const { pending, error, run } = useServerAction();
   const [comment, setComment] = useState(initialComment ?? "");
-  const [error, setError] = useState<string | null>(null);
   const isReviewed = initialStatus && ["APPROVED", "REJECTED"].includes(initialStatus);
 
   function submit(status: "APPROVED" | "REJECTED") {
-    setError(null);
     const fd = new FormData();
     fd.set("progressId", String(progressId));
     fd.set("status", status);
     fd.set("comment", comment);
 
-    start(async () => {
-      const res = await submitSupervisorReview(fd);
-      if (!res.ok) {
-        setError(res.error);
-        return;
-      }
-      router.refresh();
+    run({
+      action: () => submitSupervisorReview(fd),
     });
   }
 

@@ -1,28 +1,22 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { resetStudentPassword } from "../actions";
+import { useServerAction } from "@/components/use-server-action";
 
 export function ResetPassword({ applicationId }: { applicationId: number }) {
-  const router = useRouter();
-  const [pending, start] = useTransition();
+  const { pending, error, run } = useServerAction();
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState("");
-  const [error, setError] = useState<string | null>(null);
   const [done, setDone] = useState(false);
 
   function submit() {
-    setError(null);
-    start(async () => {
-      const res = await resetStudentPassword(applicationId, value);
-      if (!res.ok) {
-        setError(res.error);
-        return;
-      }
-      setDone(true);
-      setValue("");
-      router.refresh();
+    run({
+      action: () => resetStudentPassword(applicationId, value),
+      onSuccess: () => {
+        setDone(true);
+        setValue("");
+      },
     });
   }
 

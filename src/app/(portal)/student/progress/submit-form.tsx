@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { FileField, type UploadedRef } from "@/app/register/file-field";
 import { submitProgressReport } from "./actions";
+import { useServerAction } from "@/components/use-server-action";
 
 export function SubmitForm({
   periodKey,
@@ -12,27 +12,21 @@ export function SubmitForm({
   periodKey: string;
   label: string;
 }) {
-  const router = useRouter();
-  const [pending, start] = useTransition();
+  const { pending, error, run, setError } = useServerAction();
   const [open, setOpen] = useState(false);
   const [file, setFile] = useState<UploadedRef | null>(null);
   const [description, setDescription] = useState("");
-  const [error, setError] = useState<string | null>(null);
 
   function submit() {
-    setError(null);
     if (!file) {
       setError("Attach your progress report file.");
       return;
     }
-    start(async () => {
-      const res = await submitProgressReport({ periodKey, description, file });
-      if (!res.ok) {
-        setError(res.error);
-        return;
-      }
-      setOpen(false);
-      router.refresh();
+    run({
+      action: () => submitProgressReport({ periodKey, description, file }),
+      onSuccess: () => {
+        setOpen(false);
+      },
     });
   }
 

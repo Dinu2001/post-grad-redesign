@@ -1,8 +1,7 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
 import { approvePresentationResult } from "../actions";
+import { useServerAction } from "@/components/use-server-action";
 
 export function PresentationReviewForm({
   presentationId,
@@ -13,9 +12,7 @@ export function PresentationReviewForm({
   isDone: boolean;
   isFinal: boolean;
 }) {
-  const router = useRouter();
-  const [pending, start] = useTransition();
-  const [error, setError] = useState<string | null>(null);
+  const { pending, error, run, setError } = useServerAction();
 
   function handleApprove() {
     if (!isDone) {
@@ -23,14 +20,8 @@ export function PresentationReviewForm({
       return;
     }
 
-    setError(null);
-    start(async () => {
-      const res = await approvePresentationResult(presentationId);
-      if (!res.ok) {
-        setError(res.error);
-        return;
-      }
-      router.refresh();
+      run({
+        action: () => approvePresentationResult(presentationId),
     });
   }
 
@@ -61,7 +52,7 @@ export function PresentationReviewForm({
         )}
         {isDone && !isFinal && (
           <p className="mb-3 text-sm text-neutral-600">
-            The presentation has been completed. Review the supervisor's feedback and approve
+            The presentation has been completed. Review the supervisor&apos;s feedback and approve
             the result.
           </p>
         )}

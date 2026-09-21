@@ -26,7 +26,6 @@ export function LoginForm() {
         return;
       }
       router.push(data.home ?? "/");
-      router.refresh();
     } catch {
       setError("Network error. Please try again.");
     } finally {

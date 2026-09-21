@@ -1,21 +1,19 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { assignPresentationDate } from "../../actions";
+import { useServerAction } from "@/components/use-server-action";
 
 export function AssignPresentationForm({ applicationId }: { applicationId: number }) {
   const router = useRouter();
-  const [pending, start] = useTransition();
-  const [error, setError] = useState<string | null>(null);
+  const { pending, error, run, setError } = useServerAction();
   const [date, setDate] = useState("");
   const [title, setTitle] = useState("");
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setError(null);
-
     if (!date) {
       setError("Please select a presentation date.");
       return;
@@ -27,14 +25,12 @@ export function AssignPresentationForm({ applicationId }: { applicationId: numbe
       return;
     }
 
-    start(async () => {
-      const res = await assignPresentationDate(applicationId, presentationDate, title);
-      if (!res.ok) {
-        setError(res.error);
-        return;
-      }
-      router.push("/registrar/presentations");
-      router.refresh();
+    run({
+      action: () => assignPresentationDate(applicationId, presentationDate, title),
+      refresh: false,
+      onSuccess: () => {
+        router.push("/registrar/presentations");
+      },
     });
   }
 

@@ -42,14 +42,22 @@ export function NotificationBell({
 
   const markAll = () =>
     startTransition(async () => {
-      await markAllNotificationsRead();
-      router.refresh();
+      try {
+        await markAllNotificationsRead();
+        router.refresh();
+      } catch (error) {
+        console.error("Could not mark notifications as read", error);
+      }
     });
 
   const markOne = (id: number) =>
     startTransition(async () => {
-      await markNotificationRead(id);
-      router.refresh();
+      try {
+        await markNotificationRead(id);
+        router.refresh();
+      } catch (error) {
+        console.error("Could not mark notification as read", error);
+      }
     });
 
   return (

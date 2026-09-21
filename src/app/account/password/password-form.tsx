@@ -39,7 +39,6 @@ export function PasswordForm({
         return;
       }
       router.push(ROLE_HOME[role]);
-      router.refresh();
     } catch {
       setError("Network error. Please try again.");
     } finally {

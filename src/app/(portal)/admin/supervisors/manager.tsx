@@ -1,13 +1,13 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
+import { useState } from "react";
 import {
   createSupervisor,
   updateSupervisor,
   deleteSupervisor,
   type ActionResult,
 } from "./actions";
+import { useServerAction } from "@/components/use-server-action";
 
 export type FacultyOption = { id: number; name: string };
 
@@ -30,26 +30,15 @@ const input =
   "w-full rounded-md border border-border bg-white px-3 py-2 text-sm text-black outline-none focus:border-brand focus:ring-1 focus:ring-brand";
 
 function useAction() {
-  const router = useRouter();
-  const [pending, start] = useTransition();
-  const [error, setError] = useState<string | null>(null);
+  const { run: runAction, ...action } = useServerAction();
   function run(
-    action: (fd: FormData) => Promise<ActionResult>,
+    serverAction: (fd: FormData) => Promise<ActionResult>,
     fd: FormData,
     done?: (res: ActionResult) => void,
   ) {
-    setError(null);
-    start(async () => {
-      const res = await action(fd);
-      if (!res.ok) {
-        setError(res.error);
-        return;
-      }
-      done?.(res);
-      router.refresh();
-    });
+    runAction({ action: () => serverAction(fd), onSuccess: done });
   }
-  return { pending, error, run };
+  return { ...action, run };
 }
 
 export function SupervisorManager({

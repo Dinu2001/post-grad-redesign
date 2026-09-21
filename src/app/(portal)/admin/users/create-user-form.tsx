@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { createStaffUser } from "./actions";
+import { useServerAction } from "@/components/use-server-action";
 
 type FacultyOption = { id: number; name: string };
 
@@ -10,25 +10,19 @@ const inputClass =
   "w-full rounded-md border border-border bg-white px-3 py-2 text-sm text-black outline-none focus:border-brand focus:ring-1 focus:ring-brand";
 
 export function CreateUserForm({ faculties }: { faculties: FacultyOption[] }) {
-  const router = useRouter();
-  const [pending, start] = useTransition();
+  const { pending, error, run } = useServerAction();
   const [role, setRole] = useState("REGISTRAR");
-  const [error, setError] = useState<string | null>(null);
   const [created, setCreated] = useState<{ email: string; pw: string } | null>(
     null,
   );
 
   function onSubmit(fd: FormData) {
-    setError(null);
     setCreated(null);
-    start(async () => {
-      const res = await createStaffUser(fd);
-      if (!res.ok) {
-        setError(res.error);
-        return;
-      }
-      setCreated({ email: res.email, pw: res.tempPassword });
-      router.refresh();
+    run({
+      action: () => createStaffUser(fd),
+      onSuccess: (res) => {
+        setCreated({ email: res.email, pw: res.tempPassword });
+      },
     });
   }
 

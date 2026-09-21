@@ -1,13 +1,13 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { rejectRegistration } from "../actions";
+import { useServerAction } from "@/components/use-server-action";
 
 export function RegistrationDecision({ applicationId }: { applicationId: number }) {
   const router = useRouter();
-  const [pending, start] = useTransition();
-  const [error, setError] = useState<string | null>(null);
+  const { pending, error, run } = useServerAction();
   const [rejecting, setRejecting] = useState(false);
   const [comment, setComment] = useState("");
 
@@ -16,15 +16,12 @@ export function RegistrationDecision({ applicationId }: { applicationId: number 
   }
 
   function reject() {
-    setError(null);
-    start(async () => {
-      const res = await rejectRegistration(applicationId, comment);
-      if (!res.ok) {
-        setError(res.error);
-        return;
-      }
-      router.push("/registrar/registrations");
-      router.refresh();
+    run({
+      action: () => rejectRegistration(applicationId, comment),
+      refresh: false,
+      onSuccess: () => {
+        router.push("/registrar/registrations");
+      },
     });
   }
 

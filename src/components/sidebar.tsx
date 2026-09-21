@@ -92,9 +92,14 @@ export function Sidebar({ role, fullName, email }: Props) {
 
   async function logout() {
     setLoggingOut(true);
-    await fetch("/api/auth/logout", { method: "POST" });
-    router.push("/login");
-    router.refresh();
+    try {
+      const response = await fetch("/api/auth/logout", { method: "POST" });
+      if (!response.ok) throw new Error(`Logout failed with status ${response.status}`);
+      router.push("/login");
+    } catch (error) {
+      console.error("Logout failed", error);
+      setLoggingOut(false);
+    }
   }
 
   const initials = fullName

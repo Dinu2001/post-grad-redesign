@@ -1,8 +1,7 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
 import { markPresentationDone } from "../actions";
+import { useServerAction } from "@/components/use-server-action";
 
 export function MarkPresentationCompleteForm({
   presentationId,
@@ -11,19 +10,11 @@ export function MarkPresentationCompleteForm({
   presentationId: number;
   isDone: boolean;
 }) {
-  const router = useRouter();
-  const [pending, start] = useTransition();
-  const [error, setError] = useState<string | null>(null);
+  const { pending, error, run } = useServerAction();
 
   function handleMarkDone() {
-    setError(null);
-    start(async () => {
-      const res = await markPresentationDone(presentationId);
-      if (!res.ok) {
-        setError(res.error);
-        return;
-      }
-      router.refresh();
+    run({
+      action: () => markPresentationDone(presentationId),
     });
   }
 
@@ -32,7 +23,7 @@ export function MarkPresentationCompleteForm({
       <div className="rounded-lg border border-yellow-300 bg-yellow-50 p-4">
         <h3 className="mb-2 text-base font-bold text-yellow-900">✓ Marked Complete</h3>
         <p className="text-sm text-yellow-800">
-          This presentation has been marked as completed and is awaiting the Registrar's review.
+          This presentation has been marked as completed and is awaiting the Registrar&apos;s review.
         </p>
       </div>
     );
